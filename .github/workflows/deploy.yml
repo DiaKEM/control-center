@@ -62,10 +62,10 @@ jobs:
 
             # 4. Restart the Service
             echo "🔄 Restarting service..."
-            pm2 restart diakem-control-center-shared-kemal
+            ~/bin/pm2 restart diakem-control-center-shared-kemal
 
             # 5. Cleanup
-            rm /tmp/deploy_package.tar.gz
+            rm /tmp/deploy_package.zip
             rm -rf /tmp/extract_temp
 
             echo "✅ Deployment successful!"
