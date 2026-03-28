@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.4](https://github.com/DiaKEM/control-center/compare/v0.2.0...v0.2.4) (2026-03-28)
+
+## [0.2.3](https://github.com/DiaKEM/control-center/compare/v0.2.0...v0.2.3) (2026-03-28)
+
+## [0.2.2](https://github.com/DiaKEM/control-center/compare/v0.2.0...v0.2.2) (2026-03-28)
+
+## [0.2.1](https://github.com/DiaKEM/control-center/compare/v0.2.0...v0.2.1) (2026-03-28)
+
 ## 0.2.0 (2026-03-28)
 
 ### Features

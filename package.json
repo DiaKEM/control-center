@@ -1,14 +1,14 @@
 {
   "name": "diakem-control-center",
-  "version": "0.2.0",
+  "version": "0.2.4",
   "private": true,
   "scripts": {
     "release": "dotenv -- release-it",
     "release:dry": "dotenv -- release-it --dry-run"
   },
   "devDependencies": {
-    "@release-it/conventional-changelog": "^9.0.0",
+    "@release-it/conventional-changelog": "^10.0.6",
     "dotenv-cli": "^11.0.0",
-    "release-it": "^17.0.0"
+    "release-it": "^19.2.4"
   }
 }
