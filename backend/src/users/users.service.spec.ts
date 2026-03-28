@@ -3,7 +3,7 @@ import { ConflictException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { UsersService } from './users.service';
 import { User } from './user.schema';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 const mockUser = { username: 'alice', password: 'hashed', roles: ['user'], save: jest.fn() };
 
@@ -14,7 +14,7 @@ const mockModel = {
 };
 
 // Mock bcrypt at module level
-jest.mock('bcrypt', () => ({
+jest.mock('bcryptjs', () => ({
   hash: jest.fn(() => Promise.resolve('hashed')),
   compare: jest.fn(),
 }));
