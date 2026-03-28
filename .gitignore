@@ -3,3 +3,4 @@ TODO.md
 node_modules/
 *.zip
 .env
+.release/

@@ -3,6 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
+    "build:package": "bash scripts/build-package.sh $(node -p \"require('./package.json').version\")",
     "release": "dotenv -- release-it",
     "release:dry": "dotenv -- release-it --dry-run"
   },
