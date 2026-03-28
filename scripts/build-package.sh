@@ -18,6 +18,9 @@ cp -r frontend/dist/. .release/frontend/dist/
 cp -r backend/dist/. .release/backend/
 cp backend/package.json backend/package-lock.json backend/.env.example .release/backend/
 
+echo "Installing production dependencies..."
+npm ci --omit=dev --prefix .release/backend
+
 echo "Creating ${OUT}..."
 cd .release && zip -r "../${OUT}" frontend backend && cd ..
 rm -rf .release
