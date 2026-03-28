@@ -26,6 +26,8 @@ jobs:
             ASSET_PREFIX="diakem-control-center" 
             TOKEN="${{ secrets.MY_GITHUB_TOKEN }}"
 
+            echo "⏳ Waiting for the release to be published"
+            sleep 10
             echo "🔍 Searching for latest asset starting with: $ASSET_PREFIX"
 
             # 1. Get the browser_download_url using a 'startswith' filter
@@ -60,6 +62,34 @@ jobs:
             rm -rf ${APP_DIR}/*
             cp -R /tmp/extract_temp/* ${APP_DIR}/
             cd ${APP_DIR}/backend
+            
+            # Configuration
+            MAX_RETRIES=5
+            COUNT=0
+            COMMAND="npm install --platform=linux --arch=x64 sharp@0.32.6"
+            # Force Node to clean garbage collection at 1GB to stay under 1.5GB limit
+            export NODE_OPTIONS="--max-old-space-size=1024"
+            
+            until $COMMAND || [ $COUNT -eq $MAX_RETRIES ]; do
+              COUNT=$((COUNT + 1))
+              echo "⚠️  Install failed (likely OOM Killed). Attempt $COUNT of $MAX_RETRIES..."
+              
+              # Clean cache and remove half-finished folders to start fresh
+              npm cache clean --force
+              rm -rf node_modules/sharp
+              
+              # Optional: small sleep to let the server "breathe"
+              sleep 2
+            done
+            
+            if [ $COUNT -eq $MAX_RETRIES ]; then
+              echo "❌ Failed to install Sharp after $MAX_RETRIES attempts."
+              exit 1
+            else
+              echo "✅ Sharp installed successfully!"
+            fi
+            
+            
             #npm rebuild bcrypt --build-from-source
             #npm install sharp@0.32.6
 
