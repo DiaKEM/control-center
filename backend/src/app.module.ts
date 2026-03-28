@@ -30,6 +30,7 @@ import { NotificationManagerModule } from './notification-manager/notification-m
 import { NotificationCheckerModule } from './notification-checker/notification-checker.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { AdminModule } from './admin/admin.module';
+import { SetupModule } from './setup/setup.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { AdminModule } from './admin/admin.module';
     NotificationCheckerModule,
     SchedulerModule,
     AdminModule,
+    SetupModule,
   ],
   controllers: [AppController],
   providers: [
