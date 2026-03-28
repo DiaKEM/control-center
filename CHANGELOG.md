@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0](https://github.com/DiaKEM/control-center/compare/v0.2.5...v0.3.0) (2026-03-28)
+
+### Features
+
+* **no-ref:** add .env.example into package ([5abce91](https://github.com/DiaKEM/control-center/commit/5abce915c2daf2b7bd04c9708191b99dbd7a357b))
+
 ## [0.2.5](https://github.com/DiaKEM/control-center/compare/v0.2.0...v0.2.5) (2026-03-28)
 
 ### Bug Fixes
