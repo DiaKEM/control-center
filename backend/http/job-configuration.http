@@ -1,0 +1,101 @@
+### Variables
+@baseUrl = http://localhost:3015
+@contentType = application/json
+@apiKey = change-me
+
+###
+# List all job configurations
+GET {{baseUrl}}/api/job-configurations
+Accept: {{contentType}}
+X-Api-Key: {{apiKey}}
+
+###
+# List configurations for a specific job type
+GET {{baseUrl}}/api/job-configurations?jobTypeKey=pump-age-checker
+Accept: {{contentType}}
+X-Api-Key: {{apiKey}}
+
+###
+# Create – notify if pump is older than 4 days (all 5 hours + once at 20:00)
+POST {{baseUrl}}/api/job-configurations
+Content-Type: {{contentType}}
+X-Api-Key: {{apiKey}}
+
+{
+  "jobTypeKey": "pump-age-checker",
+  "threshold": 4,
+  "notifications": [
+    { "intervalHours": 5 },
+    { "timePoint": "20:00" }
+  ],
+  "provider": "telegram",
+  "priority": "mid"
+}
+
+###
+# Create – older than 4.5 days (all 2 hours)
+POST {{baseUrl}}/api/job-configurations
+Content-Type: {{contentType}}
+X-Api-Key: {{apiKey}}
+
+{
+  "jobTypeKey": "pump-age",
+  "threshold": 4.5,
+  "notifications": [
+    { "intervalHours": 2 },
+    { "timePoint": "20:30" }
+  ],
+  "provider": ["telegram", "pushover"],
+  "priority": "high"
+}
+
+###
+# Create – older than 5 days (all 1 hour)
+POST {{baseUrl}}/api/job-configurations
+Content-Type: {{contentType}}
+X-Api-Key: {{apiKey}}
+
+{
+  "jobTypeKey": "pump-age-checker",
+  "threshold": 5,
+  "notifications": [
+    { "intervalHours": 1 }
+  ],
+  "provider": "pushover",
+  "priority": "high"
+}
+
+###
+# Create – older than 6 days (all 30 minutes)
+POST {{baseUrl}}/api/job-configurations
+Content-Type: {{contentType}}
+X-Api-Key: {{apiKey}}
+
+{
+  "jobTypeKey": "pump-age-checker",
+  "threshold": 6,
+  "notifications": [
+    { "intervalHours": 0.5 }
+  ],
+  "provider": "pushover",
+  "priority": "urgent"
+}
+
+###
+# Update a configuration (replace <id> with an actual ObjectId)
+PATCH {{baseUrl}}/api/job-configurations/<id>
+Content-Type: {{contentType}}
+X-Api-Key: {{apiKey}}
+
+{
+  "priority": "urgent",
+  "notifications": [
+    { "intervalHours": 1 },
+    { "timePoint": "20:00" }
+  ]
+}
+
+###
+# Delete a configuration (replace <id> with an actual ObjectId)
+DELETE {{baseUrl}}/api/job-configurations/<id>
+X-Api-Key: {{apiKey}}
