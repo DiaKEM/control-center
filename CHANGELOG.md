@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.5.0](https://github.com/DiaKEM/control-center/compare/v0.4.0...v0.5.0) (2026-03-28)
+
+### Features
+
+* **no-ref:** show notification column in job execution table by default ([693c446](https://github.com/DiaKEM/control-center/commit/693c44692172fb5e284250d3eff3222f5ec14794))
+
+### Bug Fixes
+
+* **no-ref:** use bcryptjs instead of bcrypt ([9ac9851](https://github.com/DiaKEM/control-center/commit/9ac98511252ea9676e3b0577c84964aceb0f003d))
+
 ## [0.4.0](https://github.com/DiaKEM/control-center/compare/v0.3.6...v0.4.0) (2026-03-28)
 
 ### Features
