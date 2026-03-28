@@ -3,7 +3,6 @@ import { JobExecutionContext } from '../job-execution/job-execution.context';
 import { JobExecutionService } from '../job-execution/job-execution.service';
 import { GlucoseReportService, GlucoseReportStats } from './glucose-report.service';
 import { JobConfigurationService } from '../job-configuration/job-configuration.service';
-import { NotificationManagerService } from '../notification-manager/notification-manager.service';
 
 export abstract class ReportJobBase extends JobTypeBase {
   constructor(
@@ -11,7 +10,6 @@ export abstract class ReportJobBase extends JobTypeBase {
     protected readonly jobExecutionService: JobExecutionService,
     protected readonly glucoseReport: GlucoseReportService,
     protected readonly jobConfigService: JobConfigurationService,
-    protected readonly notificationManager: NotificationManagerService,
   ) {
     super();
   }
@@ -72,26 +70,24 @@ export abstract class ReportJobBase extends JobTypeBase {
         this.reportPeriodLabel,
         stats,
       );
-      const imageBuffer = await this.getImageBuffer(stats);
-      await this.notificationManager.sendMessage(config.provider, {
+
+      const mainBuffer = await this.getImageBuffer(stats);
+      const additionalImages = await this.getAdditionalImages(stats);
+
+      const imageBuffers: Array<{ data: string; caption?: string }> = [];
+      if (mainBuffer) imageBuffers.push({ data: mainBuffer.toString('base64') });
+      for (const { buffer, caption } of additionalImages) {
+        imageBuffers.push({ data: buffer.toString('base64'), caption });
+      }
+
+      await ctx.needsNotification({
         title: this.reportTitle,
         message,
         priority: config.priority,
-        imageBuffer,
+        ...(imageBuffers.length ? { imageBuffers } : {}),
       });
 
-      const additionalImages = await this.getAdditionalImages(stats);
-      for (const { buffer, caption } of additionalImages) {
-        await this.notificationManager.sendMessage(config.provider, {
-          title: caption,
-          message: caption,
-          priority: config.priority,
-          imageBuffer: buffer,
-        });
-      }
-
-      await ctx.setNotificationSent();
-      await ctx.info(`Report sent via ${config.provider.join(', ')}`);
+      await ctx.info(`Report queued for sending via ${config.provider.join(', ')}`);
       await ctx.complete();
     } catch (err: unknown) {
       await ctx.error(err?.toString() || 'Unknown error');

@@ -54,11 +54,19 @@ export class JobManagerService {
       }
       this.logger.log(`Handling ${JSON.stringify(dueNotifications)} now...`);
 
-      await this.notificationManager.sendMessage(
-        jobConfiguration.provider,
-        jobContext.notification,
-      );
-      await ctx.setNotificationSent();
+      try {
+        await this.notificationManager.sendMessage(
+          jobConfiguration.provider,
+          jobContext.notification,
+        );
+        await ctx.setNotificationSent();
+      } catch (sendErr: unknown) {
+        const message = sendErr instanceof Error ? sendErr.message : String(sendErr);
+        this.logger.error(`Job "${key}" failed to send notification: ${message}`);
+        await ctx.error(`Failed to send notification: ${message}`);
+        await ctx.fail();
+        return;
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       this.logger.error(`Job "${key}" threw an unhandled error: ${message}`);

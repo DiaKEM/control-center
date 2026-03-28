@@ -5,8 +5,6 @@ import { GlucoseReportService, GlucoseReportStats } from '../../glucose-report/g
 import { GlucoseChartService } from '../../glucose-report/glucose-chart.service';
 import { ReportJobBase } from '../../glucose-report/report-job-base';
 import { JobConfigurationService } from '../../job-configuration/job-configuration.service';
-import { NotificationManagerService } from '../../notification-manager/notification-manager.service';
-
 export const DAY_REPORT_JOB_KEY = 'day-report';
 
 @Injectable()
@@ -16,10 +14,9 @@ export class DayReportJob extends ReportJobBase {
     jobExecutionService: JobExecutionService,
     glucoseReport: GlucoseReportService,
     jobConfigService: JobConfigurationService,
-    notificationManager: NotificationManagerService,
     private readonly glucoseChart: GlucoseChartService,
   ) {
-    super(DAY_REPORT_JOB_KEY, jobExecutionService, glucoseReport, jobConfigService, notificationManager);
+    super(DAY_REPORT_JOB_KEY, jobExecutionService, glucoseReport, jobConfigService);
   }
 
   protected get reportTitle(): string { return 'Daily Report'; }

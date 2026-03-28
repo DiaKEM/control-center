@@ -353,6 +353,38 @@ export class TelegramService implements OnModuleInit {
   }
 
   /**
+   * Send multiple photos as a single album (media group).
+   * Each entry can have its own caption. Returns the sent messages.
+   */
+  async sendMediaGroupBuffers(
+    media: Array<{ buffer: Buffer; caption?: string }>,
+    options: { chat_id?: string | number; disable_notification?: boolean; reply_to_message_id?: number } = {},
+  ): Promise<TelegramMessage[]> {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const FormData = require('form-data') as typeof import('form-data');
+    const form = new FormData();
+    form.append('chat_id', String(options.chat_id ?? this.chatId));
+    if (options.disable_notification != null)
+      form.append('disable_notification', String(options.disable_notification));
+    if (options.reply_to_message_id != null)
+      form.append('reply_to_message_id', String(options.reply_to_message_id));
+
+    const mediaJson = media.map((item, i) => {
+      const key = `photo${i}`;
+      form.append(key, item.buffer, { filename: `${key}.png`, contentType: 'image/png' });
+      return { type: 'photo', media: `attach://${key}`, ...(item.caption ? { caption: item.caption } : {}) };
+    });
+    form.append('media', JSON.stringify(mediaJson));
+
+    const { data } = await this.client.post<TelegramApiResponse<TelegramMessage[]>>(
+      '/sendMediaGroup',
+      form,
+      { headers: form.getHeaders() },
+    );
+    return data.result;
+  }
+
+  /**
    * Send a document (file) by URL or file_id.
    */
   async sendDocument(

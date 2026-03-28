@@ -9,8 +9,6 @@ import {
 import { GlucoseChartService } from '../../glucose-report/glucose-chart.service';
 import { ReportJobBase } from '../../glucose-report/report-job-base';
 import { JobConfigurationService } from '../../job-configuration/job-configuration.service';
-import { NotificationManagerService } from '../../notification-manager/notification-manager.service';
-
 export const NIGHTLY_REPORT_JOB_KEY = 'nightly-report';
 
 @Injectable()
@@ -20,16 +18,9 @@ export class NightlyReportJob extends ReportJobBase {
     jobExecutionService: JobExecutionService,
     glucoseReport: GlucoseReportService,
     jobConfigService: JobConfigurationService,
-    notificationManager: NotificationManagerService,
     private readonly glucoseChart: GlucoseChartService,
   ) {
-    super(
-      NIGHTLY_REPORT_JOB_KEY,
-      jobExecutionService,
-      glucoseReport,
-      jobConfigService,
-      notificationManager,
-    );
+    super(NIGHTLY_REPORT_JOB_KEY, jobExecutionService, glucoseReport, jobConfigService);
   }
 
   protected get reportTitle(): string {

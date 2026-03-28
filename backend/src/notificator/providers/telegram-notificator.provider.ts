@@ -26,7 +26,21 @@ export class TelegramNotificatorProvider extends NotificatorProviderBase {
     const header = payload.title ? `${payload.title}\n` : '';
     const text = `${prefix} ${header}${payload.message}`;
 
-    if (payload.imageBuffer) {
+    if (payload.imageBuffers?.length) {
+      const media = payload.imageBuffers.map((img, i) => ({
+        buffer: Buffer.from(img.data, 'base64'),
+        caption: img.caption ?? '',
+      }));
+      if (media.length === 1) {
+        await this.telegram.sendPhotoBuffer(media[0].buffer, { caption: text });
+      } else {
+        const textMsg = await this.telegram.sendMessage(
+          `${prefix} ${payload.title ? `*${payload.title}*\n` : ''}${payload.message}`,
+          { parse_mode: 'Markdown' },
+        );
+        await this.telegram.sendMediaGroupBuffers(media, { reply_to_message_id: textMsg.message_id });
+      }
+    } else if (payload.imageBuffer) {
       await this.telegram.sendPhotoBuffer(payload.imageBuffer, { caption: text });
     } else {
       await this.telegram.sendMessage(`${prefix} ${payload.title ? `*${payload.title}*\n` : ''}${payload.message}`);

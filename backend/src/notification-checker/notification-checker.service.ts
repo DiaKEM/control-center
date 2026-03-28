@@ -23,7 +23,7 @@ export class NotificationCheckerService {
    */
   async check(execution: JobExecutionDocument): Promise<NotificationConfig[]> {
     const config = execution.jobConfiguration;
-    if (!config?.notifications?.length) return [];
+    if (!config?.notifications?.length) return [{}]; // no schedule configured → always send
 
     const lastSentAt = await this.findLastNotificationSentAt(
       execution.jobTypeKey,
