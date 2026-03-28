@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.5](https://github.com/DiaKEM/control-center/compare/v0.3.4...v0.3.5) (2026-03-28)
+
+### Bug Fixes
+
+* **no-ref:** adjust deploy action ([b3c928f](https://github.com/DiaKEM/control-center/commit/b3c928f6af077d7fcd0dc081ca0e247862244106))
+
 ## [0.3.4](https://github.com/DiaKEM/control-center/compare/v0.3.3...v0.3.4) (2026-03-28)
 
 ### Bug Fixes
