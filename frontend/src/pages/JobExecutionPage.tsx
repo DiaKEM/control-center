@@ -343,7 +343,6 @@ function buildColumns(onDelete: (row: JobExecution) => void) {
 
 const DEFAULT_HIDDEN: VisibilityState = {
   finishedAt: false,
-  needsNotification: false,
   notificationSentAt: false,
 }
 
