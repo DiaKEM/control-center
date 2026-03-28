@@ -24,6 +24,22 @@ export interface GlucoseReportStats {
 
 const MMOL_FACTOR = 18.0182;
 
+const DEFAULT_RANGES_MGDL: Array<{ name: string; lowerLimit: number; upperLimit: number }> = [
+  { name: 'Very Low', lowerLimit: 0,   upperLimit: 54  },
+  { name: 'Low',      lowerLimit: 54,  upperLimit: 70  },
+  { name: 'In Range', lowerLimit: 70,  upperLimit: 180 },
+  { name: 'High',     lowerLimit: 180, upperLimit: 250 },
+  { name: 'Very High',lowerLimit: 250, upperLimit: 400 },
+];
+
+const DEFAULT_RANGES_MMOL: Array<{ name: string; lowerLimit: number; upperLimit: number }> = [
+  { name: 'Very Low', lowerLimit: 0,    upperLimit: 3.0  },
+  { name: 'Low',      lowerLimit: 3.0,  upperLimit: 3.9  },
+  { name: 'In Range', lowerLimit: 3.9,  upperLimit: 10.0 },
+  { name: 'High',     lowerLimit: 10.0, upperLimit: 13.9 },
+  { name: 'Very High',lowerLimit: 13.9, upperLimit: 22.2 },
+];
+
 @Injectable()
 export class GlucoseReportService {
   constructor(
@@ -48,8 +64,11 @@ export class GlucoseReportService {
 
     const s = await this.adminSettings.getSettings('glucose-limits');
     const unit: string = s?.unit ?? 'mg/dL';
-    const configuredRanges: Array<{ name: string; lowerLimit: number; upperLimit: number }> =
+    const parsedRanges: Array<{ name: string; lowerLimit: number; upperLimit: number }> =
       s?.ranges ? (JSON.parse(s.ranges) as Array<{ name: string; lowerLimit: number; upperLimit: number }>) : [];
+    const configuredRanges = parsedRanges.length
+      ? parsedRanges
+      : unit === 'mmol/L' ? DEFAULT_RANGES_MMOL : DEFAULT_RANGES_MGDL;
 
     const factor = unit === 'mmol/L' ? 1 / MMOL_FACTOR : 1;
     const precision = unit === 'mmol/L' ? 1 : 0;
@@ -115,8 +134,11 @@ export class GlucoseReportService {
 
     const s = await this.adminSettings.getSettings('glucose-limits');
     const unit: string = s?.unit ?? 'mg/dL';
-    const configuredRanges: Array<{ name: string; lowerLimit: number; upperLimit: number }> =
+    const parsedRanges: Array<{ name: string; lowerLimit: number; upperLimit: number }> =
       s?.ranges ? (JSON.parse(s.ranges) as Array<{ name: string; lowerLimit: number; upperLimit: number }>) : [];
+    const configuredRanges = parsedRanges.length
+      ? parsedRanges
+      : unit === 'mmol/L' ? DEFAULT_RANGES_MMOL : DEFAULT_RANGES_MGDL;
     const inRangeLimits = configuredRanges.find((r) => r.name === 'In Range');
     if (!inRangeLimits) return [];
 
@@ -164,8 +186,11 @@ export class GlucoseReportService {
 
     const s = await this.adminSettings.getSettings('glucose-limits');
     const unit: string = s?.unit ?? 'mg/dL';
-    const configuredRanges: Array<{ name: string; lowerLimit: number; upperLimit: number }> =
+    const parsedRanges: Array<{ name: string; lowerLimit: number; upperLimit: number }> =
       s?.ranges ? (JSON.parse(s.ranges) as Array<{ name: string; lowerLimit: number; upperLimit: number }>) : [];
+    const configuredRanges = parsedRanges.length
+      ? parsedRanges
+      : unit === 'mmol/L' ? DEFAULT_RANGES_MMOL : DEFAULT_RANGES_MGDL;
     const inRangeLimits = configuredRanges.find((r) => r.name === 'In Range');
     if (!inRangeLimits) return [];
 
