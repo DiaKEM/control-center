@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1](https://github.com/DiaKEM/control-center/compare/v0.5.0...v0.5.1) (2026-03-28)
+
+### Bug Fixes
+
+* **no-ref:** fix service name in deploy action ([1ab59d9](https://github.com/DiaKEM/control-center/commit/1ab59d956b22a3d6ec4c46b755149605848651f9))
+
 ## [0.5.0](https://github.com/DiaKEM/control-center/compare/v0.4.0...v0.5.0) (2026-03-28)
 
 ### Features
