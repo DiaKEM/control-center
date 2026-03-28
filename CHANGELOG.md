@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.3](https://github.com/DiaKEM/control-center/compare/v0.5.2...v0.5.3) (2026-03-28)
+
+### Bug Fixes
+
+* **no-ref:** install sharp and wait 10 seconds until retrieving release package ([9c3d7a1](https://github.com/DiaKEM/control-center/commit/9c3d7a1e142ab10618650027f771f561594a54a3))
+
 ## [0.5.2](https://github.com/DiaKEM/control-center/compare/v0.5.1...v0.5.2) (2026-03-28)
 
 ### Bug Fixes
