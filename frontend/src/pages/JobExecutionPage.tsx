@@ -492,7 +492,7 @@ function PaginationBar({ table }: { table: ReturnType<typeof useReactTable<JobEx
 // ─── trigger panel ────────────────────────────────────────────────────────────
 
 function TriggerPanel({ onTriggered }: { onTriggered: () => void }) {
-  const [selected, setSelected] = useState<Set<JobTypeKey>>(new Set(JOB_TYPE_KEYS))
+  const [selected, setSelected] = useState<Set<JobTypeKey>>(new Set())
   const [triggerJobs, { isLoading }] = useTriggerJobsMutation()
   const [done, setDone] = useState(false)
 
