@@ -12,9 +12,9 @@ cd backend && npm run build && cd ..
 
 echo "Staging release structure..."
 rm -rf .release
-mkdir -p .release/frontend .release/backend
+mkdir -p .release/frontend/dist .release/backend
 
-cp -r frontend/dist/. .release/frontend/
+cp -r frontend/dist/. .release/frontend/dist/
 cp -r backend/dist/. .release/backend/
 cp backend/package.json backend/package-lock.json backend/.env.example .release/backend/
 
