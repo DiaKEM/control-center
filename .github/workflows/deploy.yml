@@ -60,8 +60,8 @@ jobs:
             rm -rf ${APP_DIR}/*
             cp -R /tmp/extract_temp/* ${APP_DIR}/
             cd ${APP_DIR}/backend
-            npm rebuild bcrypt --build-from-source
-            npm install sharp@0.32.6
+            #npm rebuild bcrypt --build-from-source
+            #npm install sharp@0.32.6
 
             # 4. Restart the Service
             echo "🔄 Restarting service..."
