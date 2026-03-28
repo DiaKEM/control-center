@@ -1,7 +1,7 @@
 {
-  "name": "diakem-notification-service",
+  "name": "diakem-control-center",
   "version": "0.0.1",
-  "description": "Simple multi-channel notification service for nightscout to receive important notifications about pump, insulin, and sensor expiration",
+  "description": "A nightscout frontend on steroids to improve diabetes management with detailed reports and alerts",
   "author": "Selcuk Kekec <khskekec@gmail.com>",
   "private": true,
   "license": "MIT",
