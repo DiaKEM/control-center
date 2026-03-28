@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.2](https://github.com/DiaKEM/control-center/compare/v0.5.1...v0.5.2) (2026-03-28)
+
+### Bug Fixes
+
+* **no-ref:** fix problem with sharp on centos ([db2310e](https://github.com/DiaKEM/control-center/commit/db2310e3ee831f2c1da15ef9c5e08945d8ab221f))
+
 ## [0.5.1](https://github.com/DiaKEM/control-center/compare/v0.5.0...v0.5.1) (2026-03-28)
 
 ### Bug Fixes
