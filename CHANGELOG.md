@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.3.6](https://github.com/DiaKEM/control-center/compare/v0.3.5...v0.3.6) (2026-03-28)
+
 ## [0.3.5](https://github.com/DiaKEM/control-center/compare/v0.3.4...v0.3.5) (2026-03-28)
 
 ### Bug Fixes
