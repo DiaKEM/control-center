@@ -6,7 +6,7 @@
     ],
     "after:bump": [
       "zip -r frontend-${version}.zip frontend/dist",
-      "cd backend && zip -r ../backend-${version}.zip dist package.json package-lock.json -x 'dist/.env'"
+      "cd backend && zip -r ../backend-${version}.zip dist package.json package-lock.json .env.example -x 'dist/.env'"
     ],
     "after:release": [
       "rm -f frontend-${version}.zip backend-${version}.zip"
