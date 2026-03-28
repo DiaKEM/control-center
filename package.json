@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "release": "dotenv release-it",
-    "release:dry": "dotenv release-it --dry-run"
+    "release": "dotenv -- release-it",
+    "release:dry": "dotenv -- release-it --dry-run"
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "^9.0.0",
