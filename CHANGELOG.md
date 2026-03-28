@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.5](https://github.com/DiaKEM/control-center/compare/v0.2.0...v0.2.5) (2026-03-28)
+
+### Bug Fixes
+
+* **no-ref:** fix backend problem in release package ([17c7c44](https://github.com/DiaKEM/control-center/commit/17c7c445b9dc05e438b9be83920dd19421e26e7a))
+
 ## [0.2.4](https://github.com/DiaKEM/control-center/compare/v0.2.0...v0.2.4) (2026-03-28)
 
 ## [0.2.3](https://github.com/DiaKEM/control-center/compare/v0.2.0...v0.2.3) (2026-03-28)
