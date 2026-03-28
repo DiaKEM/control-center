@@ -91,11 +91,14 @@ export class AdminController {
         apiKey: ns?.apiKey ?? this.config.get<string>('NIGHTSCOUT_API_KEY', ''),
       },
       pushover: {
-        appToken: po?.appToken ?? this.config.get<string>('PUSHOVER_APP_TOKEN', ''),
-        userKey: po?.userKey ?? this.config.get<string>('PUSHOVER_USER_KEY', ''),
+        appToken:
+          po?.appToken ?? this.config.get<string>('PUSHOVER_APP_TOKEN', ''),
+        userKey:
+          po?.userKey ?? this.config.get<string>('PUSHOVER_USER_KEY', ''),
       },
       telegram: {
-        botToken: tg?.botToken ?? this.config.get<string>('TELEGRAM_BOT_TOKEN', ''),
+        botToken:
+          tg?.botToken ?? this.config.get<string>('TELEGRAM_BOT_TOKEN', ''),
         chatId: tg?.chatId ?? this.config.get<string>('TELEGRAM_CHAT_ID', ''),
       },
     };
@@ -136,7 +139,9 @@ export class AdminController {
 
   @Post('config/test/:service')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Test connection using the provided credentials (does not save)' })
+  @ApiOperation({
+    summary: 'Test connection using the provided credentials (does not save)',
+  })
   @ApiOkResponse()
   async testConnection(
     @Param('service') service: string,
@@ -149,8 +154,13 @@ export class AdminController {
           const apiKey = body['apiKey'] ?? '';
           if (!url || !apiKey) return { ok: false };
           const hashed = createHash('sha1').update(apiKey).digest('hex');
-          const client = axios.create({ baseURL: url, headers: { 'api-secret': hashed } });
-          const { data } = await client.get<{ status?: string }>('/api/v1/status');
+          const client = axios.create({
+            baseURL: url,
+            headers: { 'api-secret': hashed },
+          });
+          const { data } = await client.get<{ status?: string }>(
+            '/api/v1/status',
+          );
           return { ok: data?.status === 'ok' };
         }
         case 'pushover': {
@@ -190,7 +200,9 @@ export class AdminController {
   @ApiOperation({ summary: 'Update cron expression and apply immediately' })
   @ApiOkResponse()
   async updateScheduler(@Body() body: SchedulerConfigDto) {
-    await this.adminSettings.upsertSettings('scheduler', { expression: body.expression });
+    await this.adminSettings.upsertSettings('scheduler', {
+      expression: body.expression,
+    });
     await this.scheduler.reinitialize(body.expression);
     return {
       expression: this.scheduler.getEffectiveExpression(),
@@ -206,7 +218,10 @@ export class AdminController {
 
     const [dbStats, collStats] = await Promise.all([
       db.command({ dbStats: 1 }),
-      db.collection('job_executions').aggregate([{ $collStats: { storageStats: {} } }]).toArray(),
+      db
+        .collection('job_executions')
+        .aggregate([{ $collStats: { storageStats: {} } }])
+        .toArray(),
     ]);
 
     const jobStats = collStats[0]?.storageStats;
@@ -217,14 +232,18 @@ export class AdminController {
       collections: dbStats.collections as number,
       jobExecutions: {
         count: (jobStats?.count as number) ?? 0,
-        sizeMb: jobStats ? +((jobStats.size as number) / 1024 / 1024).toFixed(2) : 0,
+        sizeMb: jobStats
+          ? +((jobStats.size as number) / 1024 / 1024).toFixed(2)
+          : 0,
       },
     };
   }
 
   @Delete('database/job-executions')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Delete job execution entries older than a given date' })
+  @ApiOperation({
+    summary: 'Delete job execution entries older than a given date',
+  })
   @ApiOkResponse()
   async deleteJobExecutions(
     @Query('before') before: string,
@@ -235,7 +254,9 @@ export class AdminController {
   }
 
   @Get('glucose-limits')
-  @ApiOperation({ summary: 'Return the configured blood glucose limits and named ranges' })
+  @ApiOperation({
+    summary: 'Return the configured blood glucose limits and named ranges',
+  })
   @ApiOkResponse()
   async getGlucoseLimits(): Promise<{
     unit: string;
@@ -243,9 +264,13 @@ export class AdminController {
   }> {
     const s = await this.adminSettings.getSettings('glucose-limits');
     const ranges = s?.ranges
-      ? (JSON.parse(s.ranges) as Array<{ name: string; lowerLimit: number; upperLimit: number }>)
+      ? (JSON.parse(s.ranges) as Array<{
+          name: string;
+          lowerLimit: number;
+          upperLimit: number;
+        }>)
       : [];
-    return { unit: s?.unit ?? 'mg/dL', ranges };
+    return { unit: s?.unit ?? 'mg/dl', ranges };
   }
 
   @Patch('glucose-limits')

@@ -19,7 +19,7 @@ export interface DatabaseStats {
   jobExecutions: { count: number; sizeMb: number }
 }
 
-export type GlucoseUnit = 'mg/dL' | 'mmol/L'
+export type GlucoseUnit = 'mg/dl' | 'mmol/L'
 
 export interface GlucoseRange {
   name: string

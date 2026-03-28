@@ -496,7 +496,7 @@ function DatabasePanel() {
 
 // ─── glucose limits panel ─────────────────────────────────────────────────────
 
-const UNITS: GlucoseUnit[] = ['mg/dL', 'mmol/L']
+const UNITS: GlucoseUnit[] = ['mg/dl', 'mmol/L']
 
 const RANGE_NAMES = ['Very Low', 'Low', 'In Range', 'High', 'Very High'] as const
 type RangeName = (typeof RANGE_NAMES)[number]
@@ -510,7 +510,7 @@ const RANGE_STYLE: Record<RangeName, { dot: string; badge: string }> = {
 }
 
 const DEFAULTS: Record<GlucoseUnit, Array<{ name: RangeName; lowerLimit: number; upperLimit: number }>> = {
-  'mg/dL': [
+  'mg/dl': [
     { name: 'Very Low',  lowerLimit: 0,   upperLimit: 54  },
     { name: 'Low',       lowerLimit: 54,  upperLimit: 70  },
     { name: 'In Range',  lowerLimit: 70,  upperLimit: 180 },
@@ -530,8 +530,8 @@ function GlucoseLimitsPanel() {
   const { data, isLoading, isError } = useGetGlucoseLimitsQuery()
   const [updateGlucoseLimits, { isLoading: isSaving, isSuccess }] = useUpdateGlucoseLimitsMutation()
 
-  const [unit, setUnit] = useState<GlucoseUnit>('mg/dL')
-  const [ranges, setRanges] = useState<GlucoseRange[]>(DEFAULTS['mg/dL'])
+  const [unit, setUnit] = useState<GlucoseUnit>('mg/dl')
+  const [ranges, setRanges] = useState<GlucoseRange[]>(DEFAULTS['mg/dl'])
 
   useEffect(() => {
     if (data) {

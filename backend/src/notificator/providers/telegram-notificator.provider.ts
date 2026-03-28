@@ -23,27 +23,25 @@ export class TelegramNotificatorProvider extends NotificatorProviderBase {
 
   async send(payload: NotificatorPayload): Promise<void> {
     const prefix = PRIORITY_PREFIX[payload.priority];
-    const header = payload.title ? `${payload.title}\n` : '';
-    const text = `${prefix} ${header}${payload.message}`;
+    const titleLine = payload.title ? `${prefix} *${payload.title}*` : prefix;
+    const formattedText = `${titleLine}\n${payload.message}`;
 
     if (payload.imageBuffers?.length) {
-      const media = payload.imageBuffers.map((img, i) => ({
+      const media = payload.imageBuffers.map((img) => ({
         buffer: Buffer.from(img.data, 'base64'),
         caption: img.caption ?? '',
       }));
       if (media.length === 1) {
-        await this.telegram.sendPhotoBuffer(media[0].buffer, { caption: text });
+        await this.telegram.sendPhotoBuffer(media[0].buffer, { caption: formattedText, parse_mode: 'Markdown' });
       } else {
-        const textMsg = await this.telegram.sendMessage(
-          `${prefix} ${payload.title ? `*${payload.title}*\n` : ''}${payload.message}`,
-          { parse_mode: 'Markdown' },
-        );
+        const textMsg = await this.telegram.sendMessage(formattedText, { parse_mode: 'Markdown' });
         await this.telegram.sendMediaGroupBuffers(media, { reply_to_message_id: textMsg.message_id });
       }
     } else if (payload.imageBuffer) {
-      await this.telegram.sendPhotoBuffer(payload.imageBuffer, { caption: text });
+      await this.telegram.sendPhotoBuffer(payload.imageBuffer, { caption: formattedText, parse_mode: 'Markdown' });
     } else {
-      await this.telegram.sendMessage(`${prefix} ${payload.title ? `*${payload.title}*\n` : ''}${payload.message}`);
+      await this.telegram.sendMessage(formattedText, { parse_mode: 'Markdown' });
     }
+
   }
 }

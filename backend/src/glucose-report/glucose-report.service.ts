@@ -9,14 +9,19 @@ export interface DailyAverage {
 
 export interface DailyTir {
   date: string; // YYYY-MM-DD in local time
-  tir: number;  // percentage 0–100
+  tir: number; // percentage 0–100
 }
 
 export interface GlucoseReportStats {
   average: number;
   unit: string;
   tir: number;
-  ranges: Array<{ name: string; lowerLimit: number; upperLimit: number; percentage: number }>;
+  ranges: Array<{
+    name: string;
+    lowerLimit: number;
+    upperLimit: number;
+    percentage: number;
+  }>;
   totalReadings: number;
   dailyAverages: DailyAverage[];
   dailyTir: DailyTir[];
@@ -24,20 +29,28 @@ export interface GlucoseReportStats {
 
 const MMOL_FACTOR = 18.0182;
 
-const DEFAULT_RANGES_MGDL: Array<{ name: string; lowerLimit: number; upperLimit: number }> = [
-  { name: 'Very Low', lowerLimit: 0,   upperLimit: 54  },
-  { name: 'Low',      lowerLimit: 54,  upperLimit: 70  },
-  { name: 'In Range', lowerLimit: 70,  upperLimit: 180 },
-  { name: 'High',     lowerLimit: 180, upperLimit: 250 },
-  { name: 'Very High',lowerLimit: 250, upperLimit: 400 },
+const DEFAULT_RANGES_MGDL: Array<{
+  name: string;
+  lowerLimit: number;
+  upperLimit: number;
+}> = [
+  { name: 'Very Low', lowerLimit: 0, upperLimit: 54 },
+  { name: 'Low', lowerLimit: 54, upperLimit: 70 },
+  { name: 'In Range', lowerLimit: 70, upperLimit: 180 },
+  { name: 'High', lowerLimit: 180, upperLimit: 250 },
+  { name: 'Very High', lowerLimit: 250, upperLimit: 400 },
 ];
 
-const DEFAULT_RANGES_MMOL: Array<{ name: string; lowerLimit: number; upperLimit: number }> = [
-  { name: 'Very Low', lowerLimit: 0,    upperLimit: 3.0  },
-  { name: 'Low',      lowerLimit: 3.0,  upperLimit: 3.9  },
-  { name: 'In Range', lowerLimit: 3.9,  upperLimit: 10.0 },
-  { name: 'High',     lowerLimit: 10.0, upperLimit: 13.9 },
-  { name: 'Very High',lowerLimit: 13.9, upperLimit: 22.2 },
+const DEFAULT_RANGES_MMOL: Array<{
+  name: string;
+  lowerLimit: number;
+  upperLimit: number;
+}> = [
+  { name: 'Very Low', lowerLimit: 0, upperLimit: 3.0 },
+  { name: 'Low', lowerLimit: 3.0, upperLimit: 3.9 },
+  { name: 'In Range', lowerLimit: 3.9, upperLimit: 10.0 },
+  { name: 'High', lowerLimit: 10.0, upperLimit: 13.9 },
+  { name: 'Very High', lowerLimit: 13.9, upperLimit: 22.2 },
 ];
 
 @Injectable()
@@ -57,32 +70,50 @@ export class GlucoseReportService {
     });
 
     const validEntries = entries.filter(
-      (e): e is typeof e & { sgv: number } => typeof e.sgv === 'number' && e.sgv > 0,
+      (e): e is typeof e & { sgv: number } =>
+        typeof e.sgv === 'number' && e.sgv > 0,
     );
 
     if (!validEntries.length) return null;
 
     const s = await this.adminSettings.getSettings('glucose-limits');
-    const unit: string = s?.unit ?? 'mg/dL';
-    const parsedRanges: Array<{ name: string; lowerLimit: number; upperLimit: number }> =
-      s?.ranges ? (JSON.parse(s.ranges) as Array<{ name: string; lowerLimit: number; upperLimit: number }>) : [];
+    const unit: string = s?.unit ?? 'mg/dl';
+    const parsedRanges: Array<{
+      name: string;
+      lowerLimit: number;
+      upperLimit: number;
+    }> = s?.ranges
+      ? (JSON.parse(s.ranges) as Array<{
+          name: string;
+          lowerLimit: number;
+          upperLimit: number;
+        }>)
+      : [];
     const configuredRanges = parsedRanges.length
       ? parsedRanges
-      : unit === 'mmol/L' ? DEFAULT_RANGES_MMOL : DEFAULT_RANGES_MGDL;
+      : unit === 'mmol/L'
+        ? DEFAULT_RANGES_MMOL
+        : DEFAULT_RANGES_MGDL;
 
     const factor = unit === 'mmol/L' ? 1 / MMOL_FACTOR : 1;
     const precision = unit === 'mmol/L' ? 1 : 0;
-    const values = validEntries.map((e) => +(e.sgv * factor).toFixed(precision + 1));
+    const values = validEntries.map(
+      (e) => +(e.sgv * factor).toFixed(precision + 1),
+    );
 
-    const average = +(values.reduce((a, b) => a + b, 0) / values.length).toFixed(precision);
+    const average = +(
+      values.reduce((a, b) => a + b, 0) / values.length
+    ).toFixed(precision);
 
     const ranges = configuredRanges.map((range) => {
-      const count = values.filter((v) => v >= range.lowerLimit && v <= range.upperLimit).length;
+      const count = values.filter(
+        (v) => v >= range.lowerLimit && v <= range.upperLimit,
+      ).length;
       return {
         name: range.name,
         lowerLimit: range.lowerLimit,
         upperLimit: range.upperLimit,
-        percentage: +(count / values.length * 100).toFixed(1),
+        percentage: +((count / values.length) * 100).toFixed(1),
       };
     });
 
@@ -104,18 +135,34 @@ export class GlucoseReportService {
 
     const dailyAverages: DailyAverage[] = sortedDates.map((date) => {
       const vals = byDate.get(date)!;
-      return { date, average: +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(precision) };
+      return {
+        date,
+        average: +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(
+          precision,
+        ),
+      };
     });
 
     const dailyTir: DailyTir[] = sortedDates.map((date) => {
       const vals = byDate.get(date)!;
       const inRange = inRangeLimits
-        ? vals.filter((v) => v >= inRangeLimits.lowerLimit && v <= inRangeLimits.upperLimit).length
+        ? vals.filter(
+            (v) =>
+              v >= inRangeLimits.lowerLimit && v <= inRangeLimits.upperLimit,
+          ).length
         : 0;
-      return { date, tir: +(inRange / vals.length * 100).toFixed(1) };
+      return { date, tir: +((inRange / vals.length) * 100).toFixed(1) };
     });
 
-    return { average, unit, tir, ranges, totalReadings: values.length, dailyAverages, dailyTir };
+    return {
+      average,
+      unit,
+      tir,
+      ranges,
+      totalReadings: values.length,
+      dailyAverages,
+      dailyTir,
+    };
   }
 
   /**
@@ -124,7 +171,15 @@ export class GlucoseReportService {
    */
   async computeMonthlyTirHistory(months: number): Promise<DailyTir[]> {
     const to = new Date();
-    const from = new Date(to.getFullYear(), to.getMonth() - months + 1, 1, 0, 0, 0, 0);
+    const from = new Date(
+      to.getFullYear(),
+      to.getMonth() - months + 1,
+      1,
+      0,
+      0,
+      0,
+      0,
+    );
 
     const count = Math.ceil(months * 30 * 24 * 12 * 1.2);
     const entries = await this.nightscout.getEntries({
@@ -133,12 +188,23 @@ export class GlucoseReportService {
     });
 
     const s = await this.adminSettings.getSettings('glucose-limits');
-    const unit: string = s?.unit ?? 'mg/dL';
-    const parsedRanges: Array<{ name: string; lowerLimit: number; upperLimit: number }> =
-      s?.ranges ? (JSON.parse(s.ranges) as Array<{ name: string; lowerLimit: number; upperLimit: number }>) : [];
+    const unit: string = s?.unit ?? 'mg/dl';
+    const parsedRanges: Array<{
+      name: string;
+      lowerLimit: number;
+      upperLimit: number;
+    }> = s?.ranges
+      ? (JSON.parse(s.ranges) as Array<{
+          name: string;
+          lowerLimit: number;
+          upperLimit: number;
+        }>)
+      : [];
     const configuredRanges = parsedRanges.length
       ? parsedRanges
-      : unit === 'mmol/L' ? DEFAULT_RANGES_MMOL : DEFAULT_RANGES_MGDL;
+      : unit === 'mmol/L'
+        ? DEFAULT_RANGES_MMOL
+        : DEFAULT_RANGES_MGDL;
     const inRangeLimits = configuredRanges.find((r) => r.name === 'In Range');
     if (!inRangeLimits) return [];
 
@@ -161,7 +227,7 @@ export class GlucoseReportService {
         const inRangeCount = vals.filter(
           (v) => v >= inRangeLimits.lowerLimit && v <= inRangeLimits.upperLimit,
         ).length;
-        return { date, tir: +(inRangeCount / vals.length * 100).toFixed(1) };
+        return { date, tir: +((inRangeCount / vals.length) * 100).toFixed(1) };
       })
       .sort((a, b) => a.date.localeCompare(b.date));
   }
@@ -185,12 +251,23 @@ export class GlucoseReportService {
     });
 
     const s = await this.adminSettings.getSettings('glucose-limits');
-    const unit: string = s?.unit ?? 'mg/dL';
-    const parsedRanges: Array<{ name: string; lowerLimit: number; upperLimit: number }> =
-      s?.ranges ? (JSON.parse(s.ranges) as Array<{ name: string; lowerLimit: number; upperLimit: number }>) : [];
+    const unit: string = s?.unit ?? 'mg/dl';
+    const parsedRanges: Array<{
+      name: string;
+      lowerLimit: number;
+      upperLimit: number;
+    }> = s?.ranges
+      ? (JSON.parse(s.ranges) as Array<{
+          name: string;
+          lowerLimit: number;
+          upperLimit: number;
+        }>)
+      : [];
     const configuredRanges = parsedRanges.length
       ? parsedRanges
-      : unit === 'mmol/L' ? DEFAULT_RANGES_MMOL : DEFAULT_RANGES_MGDL;
+      : unit === 'mmol/L'
+        ? DEFAULT_RANGES_MMOL
+        : DEFAULT_RANGES_MGDL;
     const inRangeLimits = configuredRanges.find((r) => r.name === 'In Range');
     if (!inRangeLimits) return [];
 
@@ -214,19 +291,40 @@ export class GlucoseReportService {
         const inRangeCount = vals.filter(
           (v) => v >= inRangeLimits.lowerLimit && v <= inRangeLimits.upperLimit,
         ).length;
-        return { date, tir: +(inRangeCount / vals.length * 100).toFixed(1) };
+        return { date, tir: +((inRangeCount / vals.length) * 100).toFixed(1) };
       })
       .sort((a, b) => a.date.localeCompare(b.date));
   }
 
   formatReport(periodLabel: string, stats: GlucoseReportStats): string {
     const u = stats.unit;
+
+    const RANGE_EMOJI: Record<string, string> = {
+      'Very Low': '🔴',
+      Low: '🟠',
+      'In Range': '🟢',
+      High: '🟡',
+      'Very High': '🔴',
+    };
+
+    const bar = (pct: number, len = 10): string => {
+      const filled = Math.round((pct / 100) * len);
+      return '█'.repeat(filled) + '░'.repeat(len - filled);
+    };
+
     const lines = [
-      `Average blood glucose level: ${stats.average} ${u}`,
-      `Total TIR: ${stats.tir}%`,
-      `--------------------------------------`,
-      ...stats.ranges.map((r) => `${r.name} (${r.lowerLimit}-${r.upperLimit} ${u}): ${r.percentage}%`),
+      `📅 ${periodLabel}`,
+      '',
+      `📈 Average: ${stats.average} ${u}`,
+      `🎯 Time in Range: ${stats.tir}%  ${bar(stats.tir)}`,
+      '',
+      'Range breakdown:',
+      ...stats.ranges.map((r) => {
+        const emoji = RANGE_EMOJI[r.name] ?? '⚪';
+        return `${emoji} ${r.name} (${r.lowerLimit}–${r.upperLimit} ${u}): ${r.percentage}%  ${bar(r.percentage)}`;
+      }),
     ];
+
     return lines.join('\n');
   }
 }
