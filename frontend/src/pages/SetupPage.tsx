@@ -48,6 +48,11 @@ export default function SetupPage() {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="flex w-full max-w-sm flex-col items-center gap-8">
         <img src="/images/logo.png" alt="Diakem Notify" className="h-44 w-auto" />
+        <h1 className="text-center text-2xl font-bold tracking-tight leading-tight">
+          <span style={{ color: '#2879C0' }}>Dia</span><span style={{ color: '#3D8B3D' }}>KEM</span>
+          <br />
+          <span>Control Center</span>
+        </h1>
         <Card className="w-full">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Welcome</CardTitle>
