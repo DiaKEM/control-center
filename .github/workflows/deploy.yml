@@ -1,0 +1,71 @@
+name: Deploy Release to Private Server
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          # Pass the tag name as an environment variable to the server
+          envs: GITHUB_REF_NAME
+          script: |
+            # --- Configuration ---
+            APP_DIR="/home/khskekec/apps/diakem-control-center/"
+            REPO="DiaKEM/control-center"
+
+            # Just the prefix of your file (e.g., "flutter-app" for "flutter-app-v2.0.tar.gz")
+            ASSET_PREFIX="diakem-control-center" 
+            TOKEN="${{ secrets.MY_GITHUB_TOKEN }}"
+
+            echo "🔍 Searching for latest asset starting with: $ASSET_PREFIX"
+
+            # 1. Get the browser_download_url using a 'startswith' filter
+            # This looks at all assets and picks the first one that matches the prefix
+            DOWNLOAD_URL=$(curl -s -H "Authorization: token $TOKEN" \
+              "https://api.github.com/repos/$REPO/releases/latest" \
+              | jq -r ".assets[] | select(.name | startswith(\"$ASSET_PREFIX\")) | .browser_download_url" | head -n 1)
+
+            if [ "$DOWNLOAD_URL" = "null" ] || [ -z "$DOWNLOAD_URL" ]; then
+              echo "❌ Error: No asset found starting with '$ASSET_PREFIX'"
+              exit 1
+            fi
+
+            echo "📦 Found matching Asset URL: $DOWNLOAD_URL"
+
+            # 2. Download the file 
+            # -L follows redirects, -o specifies the output path
+            curl -L -H "Authorization: token $TOKEN" \
+              "$DOWNLOAD_URL" \
+              -o /tmp/deploy_package.tar.gz
+
+            # 3. Clean and Extract
+            echo "🚀 Deploying to $APP_DIR..."
+            # Ensure the directory exists
+            mkdir -p $APP_DIR
+
+            # Using a temp folder for extraction to prevent partial file issues
+            mkdir -p /tmp/extract_temp
+            tar -xzf /tmp/deploy_package.tar.gz -C /tmp/extract_temp
+
+            # Atomic-ish swap: Clear target and move new files in
+            rm -rf ${APP_DIR}/*
+            cp -R /tmp/extract_temp/* ${APP_DIR}/
+
+            # 4. Restart the Service
+            echo "🔄 Restarting service..."
+            pm2 restart diakem-control-center-shared-kemal
+
+            # 5. Cleanup
+            rm /tmp/deploy_package.tar.gz
+            rm -rf /tmp/extract_temp
+
+            echo "✅ Deployment successful!"
