@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0](https://github.com/DiaKEM/control-center/compare/v0.3.6...v0.4.0) (2026-03-28)
+
+### Features
+
+* **no-ref:** use fallback glucose limits if not configured ([6143df2](https://github.com/DiaKEM/control-center/commit/6143df2c58ba6c967026e4b9d89484bb4e71d22d))
+
 ## [0.3.6](https://github.com/DiaKEM/control-center/compare/v0.3.5...v0.3.6) (2026-03-28)
 
 ## [0.3.5](https://github.com/DiaKEM/control-center/compare/v0.3.4...v0.3.5) (2026-03-28)
