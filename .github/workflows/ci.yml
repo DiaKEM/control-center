@@ -6,9 +6,9 @@ on:
   pull_request:
 
 jobs:
-  # ── Prettier ────────────────────────────────────────────────────────────────
+  # ── Format ──────────────────────────────────────────────────────────────────
   format:
-    name: Prettier
+    name: oxfmt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,17 +16,15 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: backend/package-lock.json
-      - name: Install dependencies
+          cache-dependency-path: package-lock.json
+      - name: Install root dependencies
         run: npm ci
-        working-directory: backend
       - name: Check formatting
-        run: npx prettier --check "../backend/src/**/*.ts" "../backend/test/**/*.ts" "../frontend/src/**/*.{ts,tsx}"
-        working-directory: backend
+        run: npm run format:check
 
   # ── Backend ─────────────────────────────────────────────────────────────────
   backend-lint:
-    name: Backend / ESLint
+    name: Backend / oxlint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,8 +36,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: backend
-      - name: Run ESLint
-        run: npx eslint "{src,apps,libs,test}/**/*.ts"
+      - name: Run oxlint
+        run: npm run lint:check
         working-directory: backend
 
   backend-test:
@@ -99,7 +97,7 @@ jobs:
 
   # ── Frontend ─────────────────────────────────────────────────────────────────
   frontend-lint:
-    name: Frontend / ESLint
+    name: Frontend / oxlint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -111,8 +109,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: frontend
-      - name: Run ESLint
-        run: npm run lint
+      - name: Run oxlint
+        run: npm run lint:check
         working-directory: frontend
 
   frontend-test:

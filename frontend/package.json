@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "format": "oxfmt --write -c ../.oxfmtrc.json src",
+    "format:check": "oxfmt --check -c ../.oxfmtrc.json src",
     "lint": "oxlint --fix src",
+    "lint:check": "oxlint src",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",

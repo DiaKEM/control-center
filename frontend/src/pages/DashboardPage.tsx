@@ -83,7 +83,9 @@ function StatCard({
   return (
     <div className="rounded-lg border bg-card p-5 shadow-sm flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground font-medium">{label}</span>
+        <span className="text-sm text-muted-foreground font-medium">
+          {label}
+        </span>
         <Icon className={cn('h-4 w-4', accentClass)} />
       </div>
       <div>
@@ -116,7 +118,13 @@ function glucoseAgeColor(ms: number | null) {
 
 type NsStatus = 'checking' | 'ok' | 'error' | 'unconfigured';
 
-function NightscoutBanner({ status, onRetest }: { status: NsStatus; onRetest: () => void }) {
+function NightscoutBanner({
+  status,
+  onRetest,
+}: {
+  status: NsStatus;
+  onRetest: () => void;
+}) {
   if (status === 'ok' || status === 'checking') return null;
 
   return (
@@ -135,21 +143,30 @@ function NightscoutBanner({ status, onRetest }: { status: NsStatus; onRetest: ()
       )}
       <div className="flex-1">
         <p className="font-semibold">
-          {status === 'unconfigured' ? 'Nightscout not configured' : 'Nightscout connection failed'}
+          {status === 'unconfigured'
+            ? 'Nightscout not configured'
+            : 'Nightscout connection failed'}
         </p>
         <p className="mt-0.5 text-xs opacity-80">
           {status === 'unconfigured' ? (
             <>
               Go to{' '}
-              <Link to="/admin" className="underline underline-offset-2 hover:opacity-100">
+              <Link
+                to="/admin"
+                className="underline underline-offset-2 hover:opacity-100"
+              >
                 Administration
               </Link>{' '}
               → Nightscout to enter your URL and API key.
             </>
           ) : (
             <>
-              The configured Nightscout instance could not be reached. Check the URL and API key in{' '}
-              <Link to="/admin" className="underline underline-offset-2 hover:opacity-100">
+              The configured Nightscout instance could not be reached. Check the
+              URL and API key in{' '}
+              <Link
+                to="/admin"
+                className="underline underline-offset-2 hover:opacity-100"
+              >
                 Administration
               </Link>
               .
@@ -232,21 +249,27 @@ export default function DashboardPage() {
   const todayFailed = today.filter((e) => e.status === 'failed').length;
   const todayNotifications = today.filter((e) => !!e.notificationSentAt).length;
 
-  const pushoverOk = !!(config?.pushover?.appToken && config?.pushover?.userKey);
+  const pushoverOk = !!(
+    config?.pushover?.appToken && config?.pushover?.userKey
+  );
   const telegramOk = !!(config?.telegram?.botToken && config?.telegram?.chatId);
 
   return (
     <div className="flex flex-col gap-6 p-6 max-w-5xl mx-auto">
       {/* Welcome */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Welcome back, {username}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Welcome back, {username}
+        </h1>
         <p className="text-muted-foreground text-sm mt-1">
           Here's an overview of your DiaKEM monitoring setup.
         </p>
       </div>
 
       {/* Nightscout warning */}
-      {!configLoading && <NightscoutBanner status={nsStatus} onRetest={handleRetest} />}
+      {!configLoading && (
+        <NightscoutBanner status={nsStatus} onRetest={handleRetest} />
+      )}
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -343,8 +366,16 @@ export default function DashboardPage() {
           <h2 className="font-semibold text-sm">Notification Providers</h2>
 
           <div className="flex flex-col gap-3 text-sm">
-            <ProviderRow label="Pushover" configured={pushoverOk} loading={configLoading} />
-            <ProviderRow label="Telegram" configured={telegramOk} loading={configLoading} />
+            <ProviderRow
+              label="Pushover"
+              configured={pushoverOk}
+              loading={configLoading}
+            />
+            <ProviderRow
+              label="Telegram"
+              configured={telegramOk}
+              loading={configLoading}
+            />
           </div>
 
           <p className="text-xs text-muted-foreground mt-auto">
@@ -363,7 +394,10 @@ export default function DashboardPage() {
 
 // ─── Nightscout info widget ───────────────────────────────────────────────────
 
-const TREND_MAP: Record<string, { label: string; icon: React.ElementType; color: string }> = {
+const TREND_MAP: Record<
+  string,
+  { label: string; icon: React.ElementType; color: string }
+> = {
   DoubleUp: {
     label: '↑↑ Rising fast',
     icon: TrendingUp,
@@ -410,7 +444,9 @@ function InfoRow({
         <Icon className="h-4 w-4 shrink-0" />
         {label}
       </div>
-      <span className={cn('text-sm font-medium text-right', valueClass)}>{value}</span>
+      <span className={cn('text-sm font-medium text-right', valueClass)}>
+        {value}
+      </span>
     </div>
   );
 }
@@ -426,7 +462,9 @@ function NightscoutInfoWidget({
   onRefresh: () => void;
   nsStatus: NsStatus;
 }) {
-  const trend = info?.latestGlucose?.direction ? TREND_MAP[info.latestGlucose.direction] : null;
+  const trend = info?.latestGlucose?.direction
+    ? TREND_MAP[info.latestGlucose.direction]
+    : null;
 
   const formatAge = (days: number) => {
     if (days < 1) return `${Math.round(days * 24)}h`;
@@ -456,7 +494,9 @@ function NightscoutInfoWidget({
             className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
             aria-label="Refresh"
           >
-            <RefreshCw className={cn('h-3.5 w-3.5', loading && 'animate-spin')} />
+            <RefreshCw
+              className={cn('h-3.5 w-3.5', loading && 'animate-spin')}
+            />
           </button>
         </div>
       </div>
@@ -476,10 +516,14 @@ function NightscoutInfoWidget({
             {info?.latestGlucose ? (
               <>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold">{info.latestGlucose.sgv}</span>
+                  <span className="text-3xl font-bold">
+                    {info.latestGlucose.sgv}
+                  </span>
                   <span className="text-sm text-muted-foreground">mg/dL</span>
                   {trend && (
-                    <span className={cn('text-sm font-medium', trend.color)}>{trend.label}</span>
+                    <span className={cn('text-sm font-medium', trend.color)}>
+                      {trend.label}
+                    </span>
                   )}
                 </div>
                 {info.latestGlucose.date && (
@@ -510,14 +554,20 @@ function NightscoutInfoWidget({
                   icon={info.battery.isCharging ? BatteryCharging : Battery}
                   value={
                     <span
-                      className={cn(info.battery.level <= 20 ? 'text-red-500' : 'text-foreground')}
+                      className={cn(
+                        info.battery.level <= 20
+                          ? 'text-red-500'
+                          : 'text-foreground',
+                      )}
                     >
                       {info.battery.level}%
                       {info.battery.isCharging === true && (
                         <span className="text-green-600 ml-1">⚡</span>
                       )}
                       {info.battery.isCharging === false && (
-                        <span className="text-muted-foreground ml-1 text-xs">unplugged</span>
+                        <span className="text-muted-foreground ml-1 text-xs">
+                          unplugged
+                        </span>
                       )}
                     </span>
                   }
@@ -529,7 +579,11 @@ function NightscoutInfoWidget({
               <InfoRow
                 label="Reservoir"
                 icon={Droplets}
-                value={info?.reservoirLevel != null ? `${info.reservoirLevel} U` : '—'}
+                value={
+                  info?.reservoirLevel != null
+                    ? `${info.reservoirLevel} U`
+                    : '—'
+                }
                 valueClass={
                   info?.reservoirLevel != null && info.reservoirLevel < 20
                     ? 'text-red-500'
@@ -575,7 +629,9 @@ function NightscoutInfoWidget({
           {/* Version */}
           {info?.version && (
             <div className="sm:col-span-2 border-t pt-3">
-              <span className="text-xs text-muted-foreground">Nightscout v{info.version}</span>
+              <span className="text-xs text-muted-foreground">
+                Nightscout v{info.version}
+              </span>
             </div>
           )}
         </div>

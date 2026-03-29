@@ -4,8 +4,13 @@ import {
   NOTIFICATOR_PROVIDER_STORE,
 } from './notificator-provider.registry';
 
-export function NotificatorProvider(key: NotificatorProviderKey): ClassDecorator {
+export function NotificatorProvider(
+  key: NotificatorProviderKey,
+): ClassDecorator {
   return (target: Function) => {
-    NOTIFICATOR_PROVIDER_STORE.set(key, target as typeof NotificatorProviderBase);
+    NOTIFICATOR_PROVIDER_STORE.set(
+      key,
+      target as typeof NotificatorProviderBase,
+    );
   };
 }

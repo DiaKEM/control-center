@@ -1,13 +1,14 @@
 {
   "name": "diakem-control-center",
   "version": "0.0.1",
-  "description": "A nightscout frontend on steroids to improve diabetes management with detailed reports and alerts",
-  "author": "Selcuk Kekec <khskekec@gmail.com>",
   "private": true,
+  "description": "A nightscout frontend on steroids to improve diabetes management with detailed reports and alerts",
   "license": "MIT",
+  "author": "Selcuk Kekec <khskekec@gmail.com>",
   "scripts": {
     "build": "nest build",
-    "format": "oxfmt --write src test",
+    "format": "oxfmt --write -c ../.oxfmtrc.json src test",
+    "format:check": "oxfmt --check -c ../.oxfmtrc.json src test",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -15,6 +16,7 @@
     "cli": "ts-node -r tsconfig-paths/register src/cli.ts",
     "cli:prod": "node dist/cli",
     "lint": "oxlint --fix src test",
+    "lint:check": "oxlint src test",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -70,21 +72,21 @@
     "typescript": "^5.7.3"
   },
   "jest": {
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "coverageProvider": "v8",
     "moduleFileExtensions": [
       "js",
       "json",
       "ts"
     ],
     "rootDir": "src",
+    "testEnvironment": "node",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "coverageProvider": "v8",
-    "testEnvironment": "node"
+    }
   }
 }

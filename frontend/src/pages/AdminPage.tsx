@@ -121,7 +121,8 @@ function NightscoutPanel({
 }) {
   const [url, setUrl] = useState(initial.url);
   const [apiKey, setApiKey] = useState(initial.apiKey);
-  const [updateNightscout, { isLoading, isSuccess }] = useUpdateNightscoutMutation();
+  const [updateNightscout, { isLoading, isSuccess }] =
+    useUpdateNightscoutMutation();
 
   useEffect(() => {
     setUrl(initial.url);
@@ -168,7 +169,9 @@ function NightscoutPanel({
             'Save'
           )}
         </Button>
-        {isSuccess && !isLoading && <span className="text-sm text-green-600">Saved</span>}
+        {isSuccess && !isLoading && (
+          <span className="text-sm text-green-600">Saved</span>
+        )}
         <div className="ml-auto flex items-center gap-3">
           <ConnectionBadge status={testStatus} />
           <Button
@@ -201,7 +204,8 @@ function PushoverPanel({
 }) {
   const [appToken, setAppToken] = useState(initial.appToken);
   const [userKey, setUserKey] = useState(initial.userKey);
-  const [updatePushover, { isLoading, isSuccess }] = useUpdatePushoverMutation();
+  const [updatePushover, { isLoading, isSuccess }] =
+    useUpdatePushoverMutation();
 
   useEffect(() => {
     setAppToken(initial.appToken);
@@ -247,7 +251,9 @@ function PushoverPanel({
             'Save'
           )}
         </Button>
-        {isSuccess && !isLoading && <span className="text-sm text-green-600">Saved</span>}
+        {isSuccess && !isLoading && (
+          <span className="text-sm text-green-600">Saved</span>
+        )}
         <div className="ml-auto flex items-center gap-3">
           <ConnectionBadge status={testStatus} />
           <Button
@@ -280,7 +286,8 @@ function TelegramPanel({
 }) {
   const [botToken, setBotToken] = useState(initial.botToken);
   const [chatId, setChatId] = useState(initial.chatId);
-  const [updateTelegram, { isLoading, isSuccess }] = useUpdateTelegramMutation();
+  const [updateTelegram, { isLoading, isSuccess }] =
+    useUpdateTelegramMutation();
 
   useEffect(() => {
     setBotToken(initial.botToken);
@@ -326,7 +333,9 @@ function TelegramPanel({
             'Save'
           )}
         </Button>
-        {isSuccess && !isLoading && <span className="text-sm text-green-600">Saved</span>}
+        {isSuccess && !isLoading && (
+          <span className="text-sm text-green-600">Saved</span>
+        )}
         <div className="ml-auto flex items-center gap-3">
           <ConnectionBadge status={testStatus} />
           <Button
@@ -350,7 +359,8 @@ function TelegramPanel({
 
 function SchedulerPanel() {
   const { data, isLoading, isError } = useGetSchedulerConfigQuery();
-  const [updateScheduler, { isLoading: isSaving, isSuccess }] = useUpdateSchedulerMutation();
+  const [updateScheduler, { isLoading: isSaving, isSuccess }] =
+    useUpdateSchedulerMutation();
   const [expression, setExpression] = useState('');
 
   useEffect(() => {
@@ -372,8 +382,9 @@ function SchedulerPanel() {
   return (
     <form onSubmit={handleSave} className="flex flex-col gap-4">
       <p className="text-sm text-muted-foreground">
-        Configure the cron expression for the automated job runner. Changes take effect immediately
-        without a restart. The expression uses a 6-field format:{' '}
+        Configure the cron expression for the automated job runner. Changes take
+        effect immediately without a restart. The expression uses a 6-field
+        format:{' '}
         <code className="rounded bg-muted px-1 py-0.5 text-xs">
           seconds minutes hours day month weekday
         </code>
@@ -383,7 +394,9 @@ function SchedulerPanel() {
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : isError ? (
-        <p className="text-sm text-destructive">Failed to load scheduler config.</p>
+        <p className="text-sm text-destructive">
+          Failed to load scheduler config.
+        </p>
       ) : (
         <>
           <div className="flex flex-col gap-1.5">
@@ -413,7 +426,9 @@ function SchedulerPanel() {
                 'Save & apply'
               )}
             </Button>
-            {isSuccess && !isSaving && <span className="text-sm text-green-600">Applied</span>}
+            {isSuccess && !isSaving && (
+              <span className="text-sm text-green-600">Applied</span>
+            )}
           </div>
         </>
       )}
@@ -435,8 +450,15 @@ function StatCard({ label, value }: { label: string; value: string }) {
 // ─── database panel ───────────────────────────────────────────────────────────
 
 function DatabasePanel() {
-  const { data: stats, isLoading, isError, refetch, isFetching } = useGetDatabaseStatsQuery();
-  const [deleteJobExecutions, { isLoading: isDeleting }] = useDeleteJobExecutionsMutation();
+  const {
+    data: stats,
+    isLoading,
+    isError,
+    refetch,
+    isFetching,
+  } = useGetDatabaseStatsQuery();
+  const [deleteJobExecutions, { isLoading: isDeleting }] =
+    useDeleteJobExecutionsMutation();
 
   const [beforeDate, setBeforeDate] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -444,7 +466,9 @@ function DatabasePanel() {
 
   const handleDelete = async () => {
     setConfirmOpen(false);
-    const result = await deleteJobExecutions(new Date(beforeDate).toISOString()).unwrap();
+    const result = await deleteJobExecutions(
+      new Date(beforeDate).toISOString(),
+    ).unwrap();
     setLastResult(result.deletedCount);
     setBeforeDate('');
   };
@@ -462,7 +486,9 @@ function DatabasePanel() {
             disabled={isFetching}
             className="gap-1.5 text-muted-foreground"
           >
-            <RefreshCw className={cn('h-3.5 w-3.5', isFetching && 'animate-spin')} />
+            <RefreshCw
+              className={cn('h-3.5 w-3.5', isFetching && 'animate-spin')}
+            />
             Refresh
           </Button>
         </div>
@@ -470,13 +496,21 @@ function DatabasePanel() {
         {isLoading ? (
           <p className="text-sm text-muted-foreground">Loading stats…</p>
         ) : isError ? (
-          <p className="text-sm text-destructive">Failed to load database stats.</p>
+          <p className="text-sm text-destructive">
+            Failed to load database stats.
+          </p>
         ) : stats ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatCard label="Total size" value={`${stats.totalSizeMb} MB`} />
-            <StatCard label="Storage size" value={`${stats.storageSizeMb} MB`} />
+            <StatCard
+              label="Storage size"
+              value={`${stats.storageSizeMb} MB`}
+            />
             <StatCard label="Collections" value={String(stats.collections)} />
-            <StatCard label="Job executions" value={String(stats.jobExecutions.count)} />
+            <StatCard
+              label="Job executions"
+              value={String(stats.jobExecutions.count)}
+            />
           </div>
         ) : null}
       </div>
@@ -488,7 +522,8 @@ function DatabasePanel() {
         <div>
           <h2 className="text-sm font-semibold">Archive Job Executions</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Permanently delete all job execution entries older than the selected date.
+            Permanently delete all job execution entries older than the selected
+            date.
           </p>
         </div>
         <div className="flex flex-col gap-1.5">
@@ -527,7 +562,10 @@ function DatabasePanel() {
       </div>
 
       {/* Confirmation dialog */}
-      <Dialog open={confirmOpen} onOpenChange={(v) => !v && setConfirmOpen(false)}>
+      <Dialog
+        open={confirmOpen}
+        onOpenChange={(v) => !v && setConfirmOpen(false)}
+      >
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Delete Job Executions</DialogTitle>
@@ -547,7 +585,11 @@ function DatabasePanel() {
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
               {isDeleting ? 'Deleting…' : 'Delete'}
             </Button>
           </DialogFooter>
@@ -611,10 +653,16 @@ function GlucoseLimitsPanel() {
     setRanges(DEFAULTS[newUnit]);
   };
 
-  const updateRange = (index: number, field: 'lowerLimit' | 'upperLimit', raw: string) => {
+  const updateRange = (
+    index: number,
+    field: 'lowerLimit' | 'upperLimit',
+    raw: string,
+  ) => {
     const value = parseFloat(raw);
     setRanges((prev) =>
-      prev.map((r, i) => (i === index ? { ...r, [field]: isNaN(value) ? 0 : value } : r)),
+      prev.map((r, i) =>
+        i === index ? { ...r, [field]: isNaN(value) ? 0 : value } : r,
+      ),
     );
   };
 
@@ -623,8 +671,12 @@ function GlucoseLimitsPanel() {
     await updateGlucoseLimits({ unit, ranges });
   };
 
-  if (isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
-  if (isError) return <p className="text-sm text-destructive">Failed to load glucose limits.</p>;
+  if (isLoading)
+    return <p className="text-sm text-muted-foreground">Loading…</p>;
+  if (isError)
+    return (
+      <p className="text-sm text-destructive">Failed to load glucose limits.</p>
+    );
 
   return (
     <form onSubmit={handleSave} className="flex flex-col gap-5">
@@ -655,7 +707,9 @@ function GlucoseLimitsPanel() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/40">
-              <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Range</th>
+              <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">
+                Range
+              </th>
               <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">
                 Lower ({unit})
               </th>
@@ -668,7 +722,10 @@ function GlucoseLimitsPanel() {
             {ranges.map((range, i) => {
               const style = RANGE_STYLE[range.name as RangeName];
               return (
-                <tr key={range.name} className="border-b last:border-0 hover:bg-muted/20">
+                <tr
+                  key={range.name}
+                  className="border-b last:border-0 hover:bg-muted/20"
+                >
                   <td className="px-4 py-2.5">
                     <span
                       className={cn(
@@ -676,7 +733,12 @@ function GlucoseLimitsPanel() {
                         style?.badge,
                       )}
                     >
-                      <span className={cn('h-1.5 w-1.5 rounded-full shrink-0', style?.dot)} />
+                      <span
+                        className={cn(
+                          'h-1.5 w-1.5 rounded-full shrink-0',
+                          style?.dot,
+                        )}
+                      />
                       {range.name}
                     </span>
                   </td>
@@ -687,7 +749,9 @@ function GlucoseLimitsPanel() {
                       min={0}
                       className="h-8 w-28"
                       value={range.lowerLimit}
-                      onChange={(e) => updateRange(i, 'lowerLimit', e.target.value)}
+                      onChange={(e) =>
+                        updateRange(i, 'lowerLimit', e.target.value)
+                      }
                     />
                   </td>
                   <td className="px-4 py-2">
@@ -697,7 +761,9 @@ function GlucoseLimitsPanel() {
                       min={0}
                       className="h-8 w-28"
                       value={range.upperLimit}
-                      onChange={(e) => updateRange(i, 'upperLimit', e.target.value)}
+                      onChange={(e) =>
+                        updateRange(i, 'upperLimit', e.target.value)
+                      }
                     />
                   </td>
                 </tr>
@@ -718,7 +784,9 @@ function GlucoseLimitsPanel() {
             'Save'
           )}
         </Button>
-        {isSuccess && !isSaving && <span className="text-sm text-green-600">Saved</span>}
+        {isSuccess && !isSaving && (
+          <span className="text-sm text-green-600">Saved</span>
+        )}
       </div>
     </form>
   );
@@ -739,7 +807,9 @@ function Section({
     <div className="rounded-lg border">
       <div className="border-b px-6 py-4">
         <h2 className="text-base font-semibold">{title}</h2>
-        {description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
+        {description && (
+          <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
+        )}
       </div>
       <div className="p-6">{children}</div>
     </div>
@@ -750,7 +820,9 @@ function Section({
 
 export default function AdminPage() {
   const [activeService, setActiveService] = useState<ServiceKey>('nightscout');
-  const [testStatuses, setTestStatuses] = useState<Record<ServiceKey, TestStatus>>({
+  const [testStatuses, setTestStatuses] = useState<
+    Record<ServiceKey, TestStatus>
+  >({
     nightscout: 'idle',
     pushover: 'idle',
     telegram: 'idle',
@@ -759,7 +831,10 @@ export default function AdminPage() {
   const { data: config, isLoading, isError } = useGetAdminConfigQuery();
   const [testConnection] = useTestConnectionMutation();
 
-  const handleTest = async (service: ServiceKey, cfg: Record<string, string>) => {
+  const handleTest = async (
+    service: ServiceKey,
+    cfg: Record<string, string>,
+  ) => {
     setTestStatuses((s) => ({ ...s, [service]: 'testing' }));
     try {
       const result = await testConnection({ service, config: cfg }).unwrap();
@@ -774,7 +849,8 @@ export default function AdminPage() {
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight">Administration</h1>
         <p className="text-muted-foreground">
-          Configure service integrations. Changes take effect immediately without a restart.
+          Configure service integrations. Changes take effect immediately
+          without a restart.
         </p>
       </div>
 
@@ -784,9 +860,13 @@ export default function AdminPage() {
         description="Connect Nightscout, Pushover, and Telegram. Test and save each service independently."
       >
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading configuration…</p>
+          <p className="text-sm text-muted-foreground">
+            Loading configuration…
+          </p>
         ) : isError ? (
-          <p className="text-sm text-destructive">Failed to load configuration.</p>
+          <p className="text-sm text-destructive">
+            Failed to load configuration.
+          </p>
         ) : config ? (
           <div className="flex flex-col gap-0">
             {/* Service sub-tabs */}

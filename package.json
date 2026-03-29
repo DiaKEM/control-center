@@ -6,7 +6,11 @@
     "build:package": "bash scripts/build-package.sh $(node -p \"require('./package.json').version\")",
     "release": "dotenv -- release-it",
     "release:dry": "dotenv -- release-it --dry-run",
-    "prepare": "husky"
+    "prepare": "husky",
+    "format": "npm run format --prefix backend && npm run format --prefix frontend",
+    "format:check": "npm run format:check --prefix backend && npm run format:check --prefix frontend",
+    "lint": "npm run lint --prefix backend && npm run lint --prefix frontend",
+    "lint:check": "npm run lint:check --prefix backend && npm run lint:check --prefix frontend"
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "^10.0.6",
@@ -21,11 +25,11 @@
   },
   "lint-staged": {
     "backend/{src,test}/**/*.ts": [
-      "oxfmt --write",
+      "oxfmt --write -c .oxfmtrc.json",
       "backend/node_modules/.bin/oxlint --fix"
     ],
     "frontend/src/**/*.{ts,tsx}": [
-      "oxfmt --write",
+      "oxfmt --write -c .oxfmtrc.json",
       "frontend/node_modules/.bin/oxlint --fix"
     ]
   }

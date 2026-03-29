@@ -161,8 +161,12 @@ export class PushoverService implements OnModuleInit {
 
   async reinitialize(): Promise<void> {
     const settings = await this.adminSettings.getSettings('pushover');
-    this.appToken = settings?.appToken || this.configService.get<string>('PUSHOVER_APP_TOKEN', '');
-    this.userKey = settings?.userKey || this.configService.get<string>('PUSHOVER_USER_KEY', '');
+    this.appToken =
+      settings?.appToken ||
+      this.configService.get<string>('PUSHOVER_APP_TOKEN', '');
+    this.userKey =
+      settings?.userKey ||
+      this.configService.get<string>('PUSHOVER_USER_KEY', '');
   }
 
   /**
@@ -182,24 +186,27 @@ export class PushoverService implements OnModuleInit {
    * emergency-priority messages).
    */
   async sendMessage(msg: PushoverMessage): Promise<PushoverMessageResponse> {
-    const { data } = await this.client.post<PushoverMessageResponse>('/messages.json', {
-      token: this.appToken,
-      user: msg.user ?? this.userKey,
-      message: msg.message,
-      title: msg.title,
-      device: msg.device,
-      url: msg.url,
-      url_title: msg.url_title,
-      priority: msg.priority,
-      retry: msg.retry,
-      expire: msg.expire,
-      callback: msg.callback,
-      sound: msg.sound,
-      timestamp: msg.timestamp,
-      html: msg.html,
-      monospace: msg.monospace,
-      ttl: msg.ttl,
-    });
+    const { data } = await this.client.post<PushoverMessageResponse>(
+      '/messages.json',
+      {
+        token: this.appToken,
+        user: msg.user ?? this.userKey,
+        message: msg.message,
+        title: msg.title,
+        device: msg.device,
+        url: msg.url,
+        url_title: msg.url_title,
+        priority: msg.priority,
+        retry: msg.retry,
+        expire: msg.expire,
+        callback: msg.callback,
+        sound: msg.sound,
+        timestamp: msg.timestamp,
+        html: msg.html,
+        monospace: msg.monospace,
+        ttl: msg.ttl,
+      },
+    );
     return data;
   }
 
@@ -217,28 +224,39 @@ export class PushoverService implements OnModuleInit {
     form.append('user', msg.user ?? this.userKey);
     form.append('message', msg.message);
     if (msg.title) form.append('title', msg.title);
-    if (msg.priority !== undefined) form.append('priority', String(msg.priority));
+    if (msg.priority !== undefined)
+      form.append('priority', String(msg.priority));
     if (msg.sound) form.append('sound', msg.sound);
     form.append('attachment', imageBuffer, {
       filename: 'chart.png',
       contentType: 'image/png',
     });
 
-    const { data } = await this.client.post<PushoverMessageResponse>('/messages.json', form, {
-      headers: form.getHeaders(),
-    });
+    const { data } = await this.client.post<PushoverMessageResponse>(
+      '/messages.json',
+      form,
+      {
+        headers: form.getHeaders(),
+      },
+    );
     return data;
   }
 
   /**
    * Validate a user or group key. Optionally checks a specific device.
    */
-  async validateUser(userKey?: string, device?: string): Promise<PushoverValidateResponse> {
-    const { data } = await this.client.post<PushoverValidateResponse>('/users/validate.json', {
-      token: this.appToken,
-      user: userKey ?? this.userKey,
-      device,
-    });
+  async validateUser(
+    userKey?: string,
+    device?: string,
+  ): Promise<PushoverValidateResponse> {
+    const { data } = await this.client.post<PushoverValidateResponse>(
+      '/users/validate.json',
+      {
+        token: this.appToken,
+        user: userKey ?? this.userKey,
+        device,
+      },
+    );
     return data;
   }
 
@@ -246,16 +264,21 @@ export class PushoverService implements OnModuleInit {
    * Retrieve the delivery receipt for an emergency-priority message.
    */
   async getReceipt(receipt: string): Promise<PushoverReceipt> {
-    const { data } = await this.client.get<PushoverReceipt>(`/receipts/${receipt}.json`, {
-      params: { token: this.appToken },
-    });
+    const { data } = await this.client.get<PushoverReceipt>(
+      `/receipts/${receipt}.json`,
+      {
+        params: { token: this.appToken },
+      },
+    );
     return data;
   }
 
   /**
    * Cancel an emergency-priority message before it expires.
    */
-  async cancelEmergency(receipt: string): Promise<{ status: number; request: string }> {
+  async cancelEmergency(
+    receipt: string,
+  ): Promise<{ status: number; request: string }> {
     const { data } = await this.client.post<{
       status: number;
       request: string;
@@ -267,9 +290,12 @@ export class PushoverService implements OnModuleInit {
    * Retrieve all available notification sounds.
    */
   async getSounds(): Promise<PushoverSoundsResponse> {
-    const { data } = await this.client.get<PushoverSoundsResponse>('/sounds.json', {
-      params: { token: this.appToken },
-    });
+    const { data } = await this.client.get<PushoverSoundsResponse>(
+      '/sounds.json',
+      {
+        params: { token: this.appToken },
+      },
+    );
     return data;
   }
 
@@ -277,9 +303,12 @@ export class PushoverService implements OnModuleInit {
    * Retrieve information and members of a delivery group.
    */
   async getGroup(groupKey: string): Promise<PushoverGroup> {
-    const { data } = await this.client.get<PushoverGroup>(`/groups/${groupKey}.json`, {
-      params: { token: this.appToken },
-    });
+    const { data } = await this.client.get<PushoverGroup>(
+      `/groups/${groupKey}.json`,
+      {
+        params: { token: this.appToken },
+      },
+    );
     return data;
   }
 
@@ -358,7 +387,9 @@ export class PushoverService implements OnModuleInit {
   /**
    * Push an update to the Pushover Glances widget.
    */
-  async updateGlance(glance: PushoverGlance): Promise<{ status: number; request: string }> {
+  async updateGlance(
+    glance: PushoverGlance,
+  ): Promise<{ status: number; request: string }> {
     const { data } = await this.client.post<{
       status: number;
       request: string;
