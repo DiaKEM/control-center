@@ -22,36 +22,37 @@ export class BatteryLevelJob extends JobTypeBase {
   async execute(): Promise<JobExecutionContext> {
     const ctx = await this.jobExecutionService.create(BATTERY_LEVEL_JOB_KEY);
     try {
-      const battery = await this.nightscout.getLatestBatteryLevel();
-      if (battery === null) {
+      const info = await this.nightscout.getLatestBatteryInfo();
+      if (!info) {
         await ctx.warn('No battery level found in Nightscout device status');
         await ctx.skipped();
         return ctx;
       }
 
-      await ctx.setCurrentValue(battery.toFixed(0));
+      const { level, isCharging, history } = info;
+      await ctx.setCurrentValue(level.toFixed(0));
 
       const config = await this.jobConfigService.findNextHigher(
         BATTERY_LEVEL_JOB_KEY,
-        battery,
+        level,
       );
       if (config) await ctx.setJobConfiguration(config);
 
       if (!config) {
         await ctx.info(
-          `Battery level ${battery}% is above all configured thresholds — no action needed`,
+          `Battery level ${level}% is above all configured thresholds — no action needed`,
         );
         await ctx.complete();
         return ctx;
       }
 
       await ctx.warn(
-        `Battery level ${battery}% is at or below threshold ${config.threshold}% — notification required`,
+        `Battery level ${level}% is at or below threshold ${config.threshold}% — notification required`,
       );
 
       await ctx.needsNotification({
-        title: 'Low battery warning!',
-        message: `Device battery is at ${battery}%`,
+        title: 'Low Battery',
+        message: this.buildMessage(level, isCharging, history),
         priority: config.priority,
       });
       await ctx.complete();
@@ -61,5 +62,43 @@ export class BatteryLevelJob extends JobTypeBase {
     }
 
     return ctx;
+  }
+
+  private buildMessage(
+    level: number,
+    isCharging: boolean | null,
+    history: Array<{ createdAt: Date; level: number }>,
+  ): string {
+    const bar = (pct: number, len = 10): string => {
+      const filled = Math.round((pct / 100) * len);
+      return '█'.repeat(filled) + '░'.repeat(len - filled);
+    };
+
+    const batteryEmoji = level <= 20 ? '🪫' : '🔋';
+    const lines: string[] = [
+      `${batteryEmoji} Battery: ${level}%  ${bar(level)}`,
+    ];
+
+    if (isCharging !== null) {
+      lines.push(isCharging ? '⚡ Charging' : '🔌 Not charging');
+    }
+
+    // Calculate 12h drain from oldest to newest entry in history
+    if (history.length >= 2) {
+      const newest = history[0];
+      const oldest = history[history.length - 1];
+      const drain = oldest.level - newest.level;
+      const hours =
+        (newest.createdAt.getTime() - oldest.createdAt.getTime()) / 3_600_000;
+
+      if (drain > 0 && hours > 0) {
+        const rate = drain / hours;
+        lines.push(`📉 12h drain: ${drain}%  (≈${rate.toFixed(1)}%/h)`);
+      } else if (drain <= 0) {
+        lines.push(`📈 Battery is recovering`);
+      }
+    }
+
+    return lines.join('\n');
   }
 }

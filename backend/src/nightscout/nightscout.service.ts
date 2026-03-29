@@ -757,17 +757,58 @@ export class NightscoutService implements OnModuleInit {
    * Reads `uploader.battery` which is populated by most Nightscout uploaders.
    */
   async getLatestBatteryLevel(): Promise<number | null> {
-    const statuses = await this.getDeviceStatuses({ count: 1 });
-    const status = statuses[0];
-    if (!status) return null;
+    const info = await this.getLatestBatteryInfo();
+    return info?.level ?? null;
+  }
 
-    const uploader = status['uploader'] as { battery?: number } | undefined;
-    const battery = uploader?.battery;
-    if (typeof battery === 'number') return battery;
-    const uploaderBattery = status['uploaderBattery'] as number | undefined;
-    if (typeof uploaderBattery === 'number') return uploaderBattery;
+  /**
+   * Returns current battery level, charging state (if reported by the uploader),
+   * and a history of readings over the last `historyHours` hours.
+   * Charging state is read from `uploader.isCharging` / `uploader.charging` —
+   * not all uploaders report this; returns null when unavailable.
+   */
+  async getLatestBatteryInfo(historyHours = 12): Promise<{
+    level: number;
+    isCharging: boolean | null;
+    history: Array<{ createdAt: Date; level: number }>;
+  } | null> {
+    // Fetch by count only — date filters and sort are not reliably supported on /devicestatus.
+    // Nightscout returns devicestatus records newest-first by default.
+    const statuses = await this.getDeviceStatuses({
+      count: Math.ceil(historyHours * 12) + 1,
+    });
 
-    return null;
+    if (!statuses.length) return null;
+
+    const extractLevel = (s: NightscoutDeviceStatus): number | null => {
+      const uploader = s['uploader'] as { battery?: number } | undefined;
+      if (typeof uploader?.battery === 'number') return uploader.battery;
+      const uploaderBattery = s['uploaderBattery'] as number | undefined;
+      if (typeof uploaderBattery === 'number') return uploaderBattery;
+      return null;
+    };
+
+    const latest = statuses[0];
+    const level = extractLevel(latest);
+    if (level === null) return null;
+
+    const uploader = latest['uploader'] as {
+      battery?: number;
+      isCharging?: boolean;
+      charging?: boolean;
+    } | undefined;
+    const isCharging: boolean | null =
+      uploader?.isCharging ?? uploader?.charging ?? null;
+
+    const history = statuses
+      .map((s) => {
+        const l = extractLevel(s);
+        const createdAt = s['created_at'] ? new Date(s['created_at'] as string) : null;
+        return l !== null && createdAt ? { createdAt, level: l } : null;
+      })
+      .filter((x): x is { createdAt: Date; level: number } => x !== null);
+
+    return { level, isCharging, history };
   }
 
   /**
