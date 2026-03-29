@@ -21,25 +21,30 @@ const makeConfig = (threshold: number) => ({
 
 describe('BatteryLevelJob', () => {
   let job: BatteryLevelJob;
-  let nightscout: { getLatestBatteryLevel: jest.Mock };
+  let nightscout: { getLatestBatteryInfo: jest.Mock };
   let jobConfigService: { findNextHigher: jest.Mock };
   let jobExecutionService: { create: jest.Mock };
+  let glucoseChart: { renderBatteryDrainChart: jest.Mock };
   let ctx: ReturnType<typeof makeCtx>;
 
   beforeEach(() => {
     ctx = makeCtx();
-    nightscout = { getLatestBatteryLevel: jest.fn() };
+    nightscout = { getLatestBatteryInfo: jest.fn() };
     jobConfigService = { findNextHigher: jest.fn() };
     jobExecutionService = { create: jest.fn().mockResolvedValue(ctx) };
+    glucoseChart = {
+      renderBatteryDrainChart: jest.fn().mockResolvedValue(Buffer.alloc(0)),
+    };
     job = new BatteryLevelJob(
       nightscout as any,
       jobConfigService as any,
       jobExecutionService as any,
+      glucoseChart as any,
     );
   });
 
   it('skips when battery level is null', async () => {
-    nightscout.getLatestBatteryLevel.mockResolvedValue(null);
+    nightscout.getLatestBatteryInfo.mockResolvedValue(null);
     await job.execute();
     expect(ctx.warn).toHaveBeenCalledWith(
       expect.stringContaining('No battery level'),
@@ -49,7 +54,11 @@ describe('BatteryLevelJob', () => {
   });
 
   it('completes without notification when no config matches', async () => {
-    nightscout.getLatestBatteryLevel.mockResolvedValue(80);
+    nightscout.getLatestBatteryInfo.mockResolvedValue({
+      level: 80,
+      isCharging: null,
+      history: [],
+    });
     jobConfigService.findNextHigher.mockResolvedValue(null);
     await job.execute();
     expect(ctx.setCurrentValue).toHaveBeenCalledWith('80');
@@ -61,7 +70,11 @@ describe('BatteryLevelJob', () => {
   });
 
   it('notifies when battery is at or below threshold', async () => {
-    nightscout.getLatestBatteryLevel.mockResolvedValue(20);
+    nightscout.getLatestBatteryInfo.mockResolvedValue({
+      level: 20,
+      isCharging: null,
+      history: [],
+    });
     const config = makeConfig(30);
     jobConfigService.findNextHigher.mockResolvedValue(config);
     await job.execute();
@@ -72,7 +85,7 @@ describe('BatteryLevelJob', () => {
     );
     expect(ctx.needsNotification).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: 'Low battery warning!',
+        title: 'Low Battery',
         message: expect.stringContaining('20%'),
       }),
     );
@@ -80,7 +93,7 @@ describe('BatteryLevelJob', () => {
   });
 
   it('fails on unexpected error', async () => {
-    nightscout.getLatestBatteryLevel.mockRejectedValue(
+    nightscout.getLatestBatteryInfo.mockRejectedValue(
       new Error('network error'),
     );
     await job.execute();
@@ -96,7 +109,7 @@ describe('BatteryLevelJob', () => {
   });
 
   it('creates execution with correct key', async () => {
-    nightscout.getLatestBatteryLevel.mockResolvedValue(null);
+    nightscout.getLatestBatteryInfo.mockResolvedValue(null);
     await job.execute();
     expect(jobExecutionService.create).toHaveBeenCalledWith(
       BATTERY_LEVEL_JOB_KEY,

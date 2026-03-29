@@ -38,16 +38,18 @@ function renderNavbar(username?: string) {
 describe('Navbar', () => {
   it('renders the app logo', () => {
     renderNavbar();
-    expect(screen.getByText('Diakem Notify')).toBeInTheDocument();
+    expect(screen.getByAltText('Diakem Notify')).toBeInTheDocument();
   });
 
-  it('renders navigation links', () => {
+  it('renders navigation items in jobs dropdown', async () => {
+    const user = userEvent.setup();
     renderNavbar();
+    await user.click(screen.getByRole('button', { name: /jobs/i }));
     expect(
-      screen.getByRole('link', { name: /job configurations/i }),
+      screen.getByRole('menuitem', { name: /job configurations/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: /job executions/i }),
+      screen.getByRole('menuitem', { name: /job executions/i }),
     ).toBeInTheDocument();
   });
 
@@ -63,7 +65,7 @@ describe('Navbar', () => {
     expect(store.getState().auth.isAuthenticated).toBe(true);
 
     // Open the dropdown
-    await user.click(screen.getByRole('button', { name: /alice|testuser/i }));
+    await user.click(screen.getByRole('button', { name: /testuser/i }));
     await user.click(screen.getByRole('menuitem', { name: /logout/i }));
 
     expect(store.getState().auth.isAuthenticated).toBe(false);

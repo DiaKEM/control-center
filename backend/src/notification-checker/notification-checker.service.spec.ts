@@ -15,22 +15,22 @@ describe('NotificationCheckerService', () => {
   });
 
   describe('check()', () => {
-    it('returns empty array when no jobConfiguration', async () => {
+    it('returns sentinel item when no jobConfiguration (always send)', async () => {
       const execution = {
         jobTypeKey: 'pump-age',
         jobConfiguration: null,
       } as any;
       const result = await service.check(execution);
-      expect(result).toEqual([]);
+      expect(result).toHaveLength(1);
     });
 
-    it('returns empty array when notifications is empty', async () => {
+    it('returns sentinel item when notifications is empty (always send)', async () => {
       const execution = {
         jobTypeKey: 'pump-age',
         jobConfiguration: { _id: 'cfg-1', notifications: [] },
       } as any;
       const result = await service.check(execution);
-      expect(result).toEqual([]);
+      expect(result).toHaveLength(1);
     });
 
     it('returns empty array when notification has neither intervalHours nor timePoint', async () => {

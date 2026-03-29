@@ -11,12 +11,22 @@ import axios from 'axios';
 
 const makeConfigService = () =>
   ({
+    get: jest.fn().mockImplementation((key: string) => {
+      if (key === 'TELEGRAM_BOT_TOKEN') return 'bot-token';
+      if (key === 'TELEGRAM_CHAT_ID') return 'chat-123';
+      return '';
+    }),
     getOrThrow: jest.fn().mockImplementation((key: string) => {
       if (key === 'TELEGRAM_BOT_TOKEN') return 'bot-token';
       if (key === 'TELEGRAM_CHAT_ID') return 'chat-123';
       return '';
     }),
   }) as unknown as ConfigService;
+
+const makeAdminSettings = () =>
+  ({
+    getSettings: jest.fn().mockResolvedValue(null),
+  }) as any;
 
 describe('TelegramService', () => {
   let service: TelegramService;
@@ -26,12 +36,13 @@ describe('TelegramService', () => {
     data: { ok: true, result },
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     (axios.create as jest.Mock).mockReturnValue({
       post: jest.fn().mockResolvedValue(okResponse({})),
     });
-    service = new TelegramService(makeConfigService());
+    service = new TelegramService(makeConfigService(), makeAdminSettings());
+    await service.reinitialize();
     client = (axios.create as jest.Mock).mock.results.at(-1)!.value;
   });
 

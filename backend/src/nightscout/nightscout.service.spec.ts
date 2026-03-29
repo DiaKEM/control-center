@@ -15,12 +15,22 @@ import axios from 'axios';
 
 const makeConfigService = () =>
   ({
+    get: jest.fn().mockImplementation((key: string) => {
+      if (key === 'NIGHTSCOUT_URL') return 'http://nightscout.test/';
+      if (key === 'NIGHTSCOUT_API_KEY') return 'testapikey';
+      return '';
+    }),
     getOrThrow: jest.fn().mockImplementation((key: string) => {
       if (key === 'NIGHTSCOUT_URL') return 'http://nightscout.test/';
       if (key === 'NIGHTSCOUT_API_KEY') return 'testapikey';
       return '';
     }),
   }) as unknown as ConfigService;
+
+const makeAdminSettings = () =>
+  ({
+    getSettings: jest.fn().mockResolvedValue(null),
+  }) as any;
 
 describe('NightscoutService', () => {
   let service: NightscoutService;
@@ -32,7 +42,7 @@ describe('NightscoutService', () => {
     delete: jest.Mock;
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     (axios.create as jest.Mock).mockReturnValue({
       get: jest.fn().mockResolvedValue({ data: {} }),
@@ -41,7 +51,8 @@ describe('NightscoutService', () => {
       patch: jest.fn().mockResolvedValue({ data: {} }),
       delete: jest.fn().mockResolvedValue({ data: {} }),
     });
-    service = new NightscoutService(makeConfigService());
+    service = new NightscoutService(makeConfigService(), makeAdminSettings());
+    await service.reinitialize();
     client = (axios.create as jest.Mock).mock.results.at(-1)!.value;
   });
 

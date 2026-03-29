@@ -224,7 +224,6 @@ export class AdminController {
         .toArray(),
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const jobStats = collStats[0]?.storageStats as
       | { count: number; size: number }
       | undefined;

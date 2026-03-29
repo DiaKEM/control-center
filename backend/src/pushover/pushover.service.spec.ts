@@ -12,6 +12,11 @@ import axios from 'axios';
 
 const makeConfigService = () =>
   ({
+    get: jest.fn().mockImplementation((key: string) => {
+      if (key === 'PUSHOVER_APP_TOKEN') return 'app-token';
+      if (key === 'PUSHOVER_USER_KEY') return 'user-key';
+      return '';
+    }),
     getOrThrow: jest.fn().mockImplementation((key: string) => {
       if (key === 'PUSHOVER_APP_TOKEN') return 'app-token';
       if (key === 'PUSHOVER_USER_KEY') return 'user-key';
@@ -19,17 +24,23 @@ const makeConfigService = () =>
     }),
   }) as unknown as ConfigService;
 
+const makeAdminSettings = () =>
+  ({
+    getSettings: jest.fn().mockResolvedValue(null),
+  }) as any;
+
 describe('PushoverService', () => {
   let service: PushoverService;
   let client: { get: jest.Mock; post: jest.Mock };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     (axios.create as jest.Mock).mockReturnValue({
       get: jest.fn().mockResolvedValue({ data: {} }),
       post: jest.fn().mockResolvedValue({ data: {} }),
     });
-    service = new PushoverService(makeConfigService());
+    service = new PushoverService(makeConfigService(), makeAdminSettings());
+    await service.reinitialize();
     client = (axios.create as jest.Mock).mock.results.at(-1)!.value;
   });
 

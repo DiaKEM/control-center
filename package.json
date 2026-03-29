@@ -5,14 +5,28 @@
   "scripts": {
     "build:package": "bash scripts/build-package.sh $(node -p \"require('./package.json').version\")",
     "release": "dotenv -- release-it",
-    "release:dry": "dotenv -- release-it --dry-run"
+    "release:dry": "dotenv -- release-it --dry-run",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "^10.0.6",
     "dotenv-cli": "^11.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.1",
     "release-it": "^19.2.4"
   },
   "dependencies": {
     "sharp": "^0.32.6"
+  },
+  "lint-staged": {
+    "backend/{src,test}/**/*.ts": [
+      "prettier --write",
+      "backend/node_modules/.bin/eslint --fix --config backend/eslint.config.mjs"
+    ],
+    "frontend/src/**/*.{ts,tsx}": [
+      "prettier --write",
+      "frontend/node_modules/.bin/eslint --fix --config frontend/eslint.config.js"
+    ]
   }
 }
