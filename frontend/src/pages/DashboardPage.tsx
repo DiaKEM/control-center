@@ -149,7 +149,7 @@ export default function DashboardPage() {
   const { data: scheduler } = useGetSchedulerConfigQuery()
   const { data: executions } = useGetJobExecutionsQuery({ limit: 100 })
   const { data: configs } = useGetJobConfigurationsQuery()
-  const { data: nsInfo, isLoading: nsInfoLoading, refetch: refetchNsInfo } = useGetNightscoutInfoQuery(undefined, { skip: nsStatus === 'unconfigured' })
+  const { data: nsInfo, isLoading: nsInfoLoading, refetch: refetchNsInfo } = useGetNightscoutInfoQuery(undefined, { skip: nsStatus === 'unconfigured', pollingInterval: 60_000 })
 
   const [testConnection, { isLoading: testing }] = useTestConnectionMutation()
 
