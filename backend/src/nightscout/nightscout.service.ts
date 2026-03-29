@@ -113,7 +113,8 @@ export class NightscoutService implements OnModuleInit {
       settings?.url || this.configService.get<string>('NIGHTSCOUT_URL', '')
     ).replace(/\/$/, '');
     const apiKey =
-      settings?.apiKey || this.configService.get<string>('NIGHTSCOUT_API_KEY', '');
+      settings?.apiKey ||
+      this.configService.get<string>('NIGHTSCOUT_API_KEY', '');
 
     if (!baseURL || !apiKey) {
       this.logger.warn('Nightscout not configured — skipping client init');
@@ -123,7 +124,10 @@ export class NightscoutService implements OnModuleInit {
     const hashedApiKey = createHash('sha1').update(apiKey).digest('hex');
     this.client = axios.create({
       baseURL,
-      headers: { 'api-secret': hashedApiKey, 'Content-Type': 'application/json' },
+      headers: {
+        'api-secret': hashedApiKey,
+        'Content-Type': 'application/json',
+      },
     });
     this.logger.log('Nightscout client initialized');
   }
@@ -792,20 +796,26 @@ export class NightscoutService implements OnModuleInit {
     const level = extractLevel(latest);
     if (level === null) return null;
 
-    const uploader = latest['uploader'] as {
-      battery?: number;
-      isCharging?: boolean;
-      charging?: boolean;
-    } | undefined;
+    const uploader = latest['uploader'] as
+      | {
+          battery?: number;
+          isCharging?: boolean;
+          charging?: boolean;
+        }
+      | undefined;
     const isCharging: boolean | null =
-      uploader?.isCharging
-      ?? uploader?.charging
-      ?? (typeof latest['isCharging'] === 'boolean' ? (latest['isCharging'] as boolean) : null);
+      uploader?.isCharging ??
+      uploader?.charging ??
+      (typeof latest['isCharging'] === 'boolean'
+        ? (latest['isCharging'] as boolean)
+        : null);
 
     const history = statuses
       .map((s) => {
         const l = extractLevel(s);
-        const createdAt = s['created_at'] ? new Date(s['created_at'] as string) : null;
+        const createdAt = s['created_at']
+          ? new Date(s['created_at'] as string)
+          : null;
         return l !== null && createdAt ? { createdAt, level: l } : null;
       })
       .filter((x): x is { createdAt: Date; level: number } => x !== null);

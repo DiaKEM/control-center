@@ -20,7 +20,11 @@ export class AdminSettingsService {
     data: Record<string, string>,
   ): Promise<void> {
     await this.model
-      .findOneAndUpdate({ key }, { $set: { data } }, { upsert: true, new: true })
+      .findOneAndUpdate(
+        { key },
+        { $set: { data } },
+        { upsert: true, new: true },
+      )
       .exec();
   }
 }

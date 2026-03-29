@@ -39,13 +39,17 @@ describe('AuthService', () => {
   describe('validateUser', () => {
     it('throws when user not found', async () => {
       mockUsersService.findByUsername.mockResolvedValue(null);
-      await expect(service.validateUser('unknown', 'pass')).rejects.toThrow(UnauthorizedException);
+      await expect(service.validateUser('unknown', 'pass')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('throws when password is wrong', async () => {
       mockUsersService.findByUsername.mockResolvedValue(mockUser);
       mockUsersService.validatePassword.mockResolvedValue(false);
-      await expect(service.validateUser('alice', 'wrong')).rejects.toThrow(UnauthorizedException);
+      await expect(service.validateUser('alice', 'wrong')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('returns user when credentials are valid', async () => {
@@ -76,7 +80,9 @@ describe('AuthService', () => {
 
     it('throws UnauthorizedException on bad credentials', async () => {
       mockUsersService.findByUsername.mockResolvedValue(null);
-      await expect(service.login('bad', 'creds')).rejects.toThrow(UnauthorizedException);
+      await expect(service.login('bad', 'creds')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 });

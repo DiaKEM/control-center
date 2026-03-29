@@ -8,7 +8,11 @@ describe('NotificationManagerService', () => {
     resolve: jest.Mock;
   };
 
-  const payload = { title: 'Alert', message: 'Test', priority: NotificationPriority.HIGH };
+  const payload = {
+    title: 'Alert',
+    message: 'Test',
+    priority: NotificationPriority.HIGH,
+  };
 
   beforeEach(() => {
     registry = {
@@ -55,16 +59,24 @@ describe('NotificationManagerService', () => {
 
   it('does not throw when a provider fails — logs error instead', async () => {
     registry.getRegisteredKeys.mockReturnValue(['pushover']);
-    registry.resolve.mockReturnValue({ send: jest.fn().mockRejectedValue(new Error('send failed')) });
+    registry.resolve.mockReturnValue({
+      send: jest.fn().mockRejectedValue(new Error('send failed')),
+    });
 
-    await expect(service.sendMessage(['pushover'], payload)).resolves.not.toThrow();
+    await expect(
+      service.sendMessage(['pushover'], payload),
+    ).resolves.not.toThrow();
   });
 
   it('does not throw when provider throws a non-Error', async () => {
     registry.getRegisteredKeys.mockReturnValue(['pushover']);
-    registry.resolve.mockReturnValue({ send: jest.fn().mockRejectedValue('plain error') });
+    registry.resolve.mockReturnValue({
+      send: jest.fn().mockRejectedValue('plain error'),
+    });
 
-    await expect(service.sendMessage(['pushover'], payload)).resolves.not.toThrow();
+    await expect(
+      service.sendMessage(['pushover'], payload),
+    ).resolves.not.toThrow();
   });
 
   it('does nothing when no registered keys match', async () => {

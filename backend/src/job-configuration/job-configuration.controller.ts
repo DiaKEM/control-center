@@ -41,7 +41,8 @@ export class JobConfigurationController {
   @Get()
   @ApiOperation({
     summary: 'List job configurations',
-    description: 'Returns all job configurations, optionally filtered by job type.',
+    description:
+      'Returns all job configurations, optionally filtered by job type.',
   })
   @ApiQuery({
     name: 'jobTypeKey',
@@ -81,7 +82,10 @@ export class JobConfigurationController {
     summary: 'Update a job configuration',
     description: 'Partially updates an existing job configuration by its ID.',
   })
-  @ApiParam({ name: 'id', description: 'MongoDB ObjectId of the job configuration' })
+  @ApiParam({
+    name: 'id',
+    description: 'MongoDB ObjectId of the job configuration',
+  })
   @ApiOkResponse({ type: JobConfiguration })
   @ApiNotFoundResponse({ description: 'Job configuration not found' })
   async update(
@@ -109,7 +113,10 @@ export class JobConfigurationController {
     summary: 'Delete a job configuration',
     description: 'Permanently removes a job configuration by its ID.',
   })
-  @ApiParam({ name: 'id', description: 'MongoDB ObjectId of the job configuration' })
+  @ApiParam({
+    name: 'id',
+    description: 'MongoDB ObjectId of the job configuration',
+  })
   @ApiNoContentResponse({ description: 'Successfully deleted' })
   delete(@Param('id') id: string) {
     return this.service.delete(id);

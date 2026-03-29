@@ -40,7 +40,9 @@ describe('PumpOcclusionJob', () => {
   it('completes without notification when no occlusion detected', async () => {
     nightscout.getLatestPumpOcclusion.mockResolvedValue(false);
     await job.execute();
-    expect(ctx.info).toHaveBeenCalledWith(expect.stringContaining('No pump occlusion'));
+    expect(ctx.info).toHaveBeenCalledWith(
+      expect.stringContaining('No pump occlusion'),
+    );
     expect(ctx.complete).toHaveBeenCalled();
     expect(ctx.needsNotification).not.toHaveBeenCalled();
     expect(jobConfigService.findFirst).not.toHaveBeenCalled();
@@ -50,8 +52,12 @@ describe('PumpOcclusionJob', () => {
     nightscout.getLatestPumpOcclusion.mockResolvedValue(true);
     jobConfigService.findFirst.mockResolvedValue(null);
     await job.execute();
-    expect(ctx.warn).toHaveBeenCalledWith(expect.stringContaining('Pump occlusion detected'));
-    expect(ctx.warn).toHaveBeenCalledWith(expect.stringContaining('No job configuration'));
+    expect(ctx.warn).toHaveBeenCalledWith(
+      expect.stringContaining('Pump occlusion detected'),
+    );
+    expect(ctx.warn).toHaveBeenCalledWith(
+      expect.stringContaining('No job configuration'),
+    );
     expect(ctx.needsNotification).not.toHaveBeenCalled();
     expect(ctx.complete).toHaveBeenCalled();
   });
@@ -62,18 +68,24 @@ describe('PumpOcclusionJob', () => {
     jobConfigService.findFirst.mockResolvedValue(config);
     await job.execute();
     expect(ctx.setJobConfiguration).toHaveBeenCalledWith(config);
-    expect(ctx.needsNotification).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'Pump occlusion alarm!',
-      message: expect.stringContaining('occlusion'),
-      priority: NotificationPriority.URGENT,
-    }));
+    expect(ctx.needsNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Pump occlusion alarm!',
+        message: expect.stringContaining('occlusion'),
+        priority: NotificationPriority.URGENT,
+      }),
+    );
     expect(ctx.complete).toHaveBeenCalled();
   });
 
   it('fails on unexpected error', async () => {
-    nightscout.getLatestPumpOcclusion.mockRejectedValue(new Error('fetch failed'));
+    nightscout.getLatestPumpOcclusion.mockRejectedValue(
+      new Error('fetch failed'),
+    );
     await job.execute();
-    expect(ctx.error).toHaveBeenCalledWith(expect.stringContaining('fetch failed'));
+    expect(ctx.error).toHaveBeenCalledWith(
+      expect.stringContaining('fetch failed'),
+    );
     expect(ctx.fail).toHaveBeenCalled();
   });
 
@@ -87,6 +99,8 @@ describe('PumpOcclusionJob', () => {
   it('creates execution with correct key', async () => {
     nightscout.getLatestPumpOcclusion.mockResolvedValue(false);
     await job.execute();
-    expect(jobExecutionService.create).toHaveBeenCalledWith(PUMP_OCCLUSION_JOB_KEY);
+    expect(jobExecutionService.create).toHaveBeenCalledWith(
+      PUMP_OCCLUSION_JOB_KEY,
+    );
   });
 });

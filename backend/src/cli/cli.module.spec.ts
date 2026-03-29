@@ -9,7 +9,9 @@ describe('CliModule', () => {
     const mongooseDynamicModule = imports[1];
     const innerProviders = mongooseDynamicModule.imports?.[0]?.providers ?? [];
     const factoryProvider = innerProviders.find(
-      (p: any) => p?.provide === 'MongooseModuleOptions' && typeof p?.useFactory === 'function',
+      (p: any) =>
+        p?.provide === 'MongooseModuleOptions' &&
+        typeof p?.useFactory === 'function',
     );
     expect(factoryProvider).toBeDefined();
 

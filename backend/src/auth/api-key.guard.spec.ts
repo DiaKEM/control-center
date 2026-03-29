@@ -24,10 +24,14 @@ describe('ApiKeyGuard', () => {
   });
 
   it('throws UnauthorizedException when API key is wrong', () => {
-    expect(() => guard.canActivate(makeContext('wrong-key') as any)).toThrow(UnauthorizedException);
+    expect(() => guard.canActivate(makeContext('wrong-key') as any)).toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('throws UnauthorizedException when API key is missing', () => {
-    expect(() => guard.canActivate(makeContext(undefined) as any)).toThrow(UnauthorizedException);
+    expect(() => guard.canActivate(makeContext(undefined) as any)).toThrow(
+      UnauthorizedException,
+    );
   });
 });

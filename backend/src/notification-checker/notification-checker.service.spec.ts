@@ -18,7 +18,10 @@ describe('NotificationCheckerService', () => {
 
   describe('check()', () => {
     it('returns empty array when no jobConfiguration', async () => {
-      const execution = { jobTypeKey: 'pump-age', jobConfiguration: null } as any;
+      const execution = {
+        jobTypeKey: 'pump-age',
+        jobConfiguration: null,
+      } as any;
       const result = await service.check(execution);
       expect(result).toEqual([]);
     });
@@ -47,7 +50,10 @@ describe('NotificationCheckerService', () => {
       model.findOne.mockReturnValue(makeModelQuery(null));
       const execution = {
         jobTypeKey: 'pump-age',
-        jobConfiguration: { _id: 'cfg-1', notifications: [{ intervalHours: 4 }] },
+        jobConfiguration: {
+          _id: 'cfg-1',
+          notifications: [{ intervalHours: 4 }],
+        },
       } as any;
       const result = await service.check(execution);
       expect(result).toHaveLength(1);
@@ -55,10 +61,15 @@ describe('NotificationCheckerService', () => {
 
     it('is due when enough time has elapsed since last notification', async () => {
       const fiveHoursAgo = new Date(Date.now() - 5 * 60 * 60 * 1000);
-      model.findOne.mockReturnValue(makeModelQuery({ notificationSentAt: fiveHoursAgo }));
+      model.findOne.mockReturnValue(
+        makeModelQuery({ notificationSentAt: fiveHoursAgo }),
+      );
       const execution = {
         jobTypeKey: 'pump-age',
-        jobConfiguration: { _id: 'cfg-1', notifications: [{ intervalHours: 4 }] },
+        jobConfiguration: {
+          _id: 'cfg-1',
+          notifications: [{ intervalHours: 4 }],
+        },
       } as any;
       const result = await service.check(execution);
       expect(result).toHaveLength(1);
@@ -66,10 +77,15 @@ describe('NotificationCheckerService', () => {
 
     it('is NOT due when notification was sent recently', async () => {
       const oneHourAgo = new Date(Date.now() - 1 * 60 * 60 * 1000);
-      model.findOne.mockReturnValue(makeModelQuery({ notificationSentAt: oneHourAgo }));
+      model.findOne.mockReturnValue(
+        makeModelQuery({ notificationSentAt: oneHourAgo }),
+      );
       const execution = {
         jobTypeKey: 'pump-age',
-        jobConfiguration: { _id: 'cfg-1', notifications: [{ intervalHours: 4 }] },
+        jobConfiguration: {
+          _id: 'cfg-1',
+          notifications: [{ intervalHours: 4 }],
+        },
       } as any;
       const result = await service.check(execution);
       expect(result).toHaveLength(0);
@@ -106,7 +122,9 @@ describe('NotificationCheckerService', () => {
       const now = new Date();
       // Last sent 30 seconds ago (within window)
       const recentlySent = new Date(Date.now() - 30 * 1000);
-      model.findOne.mockReturnValue(makeModelQuery({ notificationSentAt: recentlySent }));
+      model.findOne.mockReturnValue(
+        makeModelQuery({ notificationSentAt: recentlySent }),
+      );
       const timePoint = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       const execution = {
         jobTypeKey: 'pump-age',
@@ -120,7 +138,9 @@ describe('NotificationCheckerService', () => {
       const now = new Date();
       // Last sent 6 hours ago (outside the 3-min window around the timePoint)
       const longAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
-      model.findOne.mockReturnValue(makeModelQuery({ notificationSentAt: longAgo }));
+      model.findOne.mockReturnValue(
+        makeModelQuery({ notificationSentAt: longAgo }),
+      );
       const timePoint = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       const execution = {
         jobTypeKey: 'pump-age',
@@ -135,7 +155,10 @@ describe('NotificationCheckerService', () => {
     it('queries with jobConfiguration._id when provided', async () => {
       const execution = {
         jobTypeKey: 'battery-level',
-        jobConfiguration: { _id: 'cfg-99', notifications: [{ intervalHours: 2 }] },
+        jobConfiguration: {
+          _id: 'cfg-99',
+          notifications: [{ intervalHours: 2 }],
+        },
       } as any;
       await service.check(execution);
       expect(model.findOne).toHaveBeenCalledWith(

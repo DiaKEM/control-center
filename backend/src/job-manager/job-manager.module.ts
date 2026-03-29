@@ -6,7 +6,11 @@ import { JobManagerService } from './job-manager.service';
 import { JobManagerController } from './job-manager.controller';
 
 @Module({
-  imports: [JobTypeModule, NotificationManagerModule, NotificationCheckerModule],
+  imports: [
+    JobTypeModule,
+    NotificationManagerModule,
+    NotificationCheckerModule,
+  ],
   providers: [JobManagerService],
   controllers: [JobManagerController],
   exports: [JobManagerService],

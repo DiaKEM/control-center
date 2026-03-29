@@ -38,11 +38,15 @@ describe('RolesGuard', () => {
   it('throws ForbiddenException when user lacks required role', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['admin']);
     const user = { roles: ['user'] };
-    expect(() => guard.canActivate(makeContext(user, ['admin']))).toThrow(ForbiddenException);
+    expect(() => guard.canActivate(makeContext(user, ['admin']))).toThrow(
+      ForbiddenException,
+    );
   });
 
   it('throws ForbiddenException when user is undefined', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['admin']);
-    expect(() => guard.canActivate(makeContext(undefined, ['admin']))).toThrow(ForbiddenException);
+    expect(() => guard.canActivate(makeContext(undefined, ['admin']))).toThrow(
+      ForbiddenException,
+    );
   });
 });

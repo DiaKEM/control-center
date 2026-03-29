@@ -30,7 +30,9 @@ describe('JobTypeRegistryService', () => {
 
     it('throws NotFoundException when key is not registered', () => {
       JOB_TYPE_STORE.delete('pump-occlusion');
-      expect(() => service.resolve('pump-occlusion')).toThrow(NotFoundException);
+      expect(() => service.resolve('pump-occlusion')).toThrow(
+        NotFoundException,
+      );
     });
   });
 

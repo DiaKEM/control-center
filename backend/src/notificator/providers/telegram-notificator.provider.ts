@@ -32,16 +32,27 @@ export class TelegramNotificatorProvider extends NotificatorProviderBase {
         caption: img.caption ?? '',
       }));
       if (media.length === 1) {
-        await this.telegram.sendPhotoBuffer(media[0].buffer, { caption: formattedText, parse_mode: 'Markdown' });
+        await this.telegram.sendPhotoBuffer(media[0].buffer, {
+          caption: formattedText,
+          parse_mode: 'Markdown',
+        });
       } else {
-        const textMsg = await this.telegram.sendMessage(formattedText, { parse_mode: 'Markdown' });
-        await this.telegram.sendMediaGroupBuffers(media, { reply_to_message_id: textMsg.message_id });
+        const textMsg = await this.telegram.sendMessage(formattedText, {
+          parse_mode: 'Markdown',
+        });
+        await this.telegram.sendMediaGroupBuffers(media, {
+          reply_to_message_id: textMsg.message_id,
+        });
       }
     } else if (payload.imageBuffer) {
-      await this.telegram.sendPhotoBuffer(payload.imageBuffer, { caption: formattedText, parse_mode: 'Markdown' });
+      await this.telegram.sendPhotoBuffer(payload.imageBuffer, {
+        caption: formattedText,
+        parse_mode: 'Markdown',
+      });
     } else {
-      await this.telegram.sendMessage(formattedText, { parse_mode: 'Markdown' });
+      await this.telegram.sendMessage(formattedText, {
+        parse_mode: 'Markdown',
+      });
     }
-
   }
 }

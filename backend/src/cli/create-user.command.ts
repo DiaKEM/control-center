@@ -17,14 +17,20 @@ export class CreateUserCommand extends CommandRunner {
     super();
   }
 
-  async run([username, password]: string[], options: CreateUserOptions): Promise<void> {
+  async run(
+    [username, password]: string[],
+    options: CreateUserOptions,
+  ): Promise<void> {
     const user = await this.users.create(username, password, options.roles);
-    console.log(`User "${user.username}" created with roles: ${user.roles.join(', ')}`);
+    console.log(
+      `User "${user.username}" created with roles: ${user.roles.join(', ')}`,
+    );
   }
 
   @Option({
     flags: '-r, --roles <roles>',
-    description: 'Comma-separated list of roles to assign (admin, user). Defaults to "user".',
+    description:
+      'Comma-separated list of roles to assign (admin, user). Defaults to "user".',
     defaultValue: 'user',
   })
   parseRoles(value: string): UserRole[] {

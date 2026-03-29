@@ -41,7 +41,9 @@ describe('BatteryLevelJob', () => {
   it('skips when battery level is null', async () => {
     nightscout.getLatestBatteryLevel.mockResolvedValue(null);
     await job.execute();
-    expect(ctx.warn).toHaveBeenCalledWith(expect.stringContaining('No battery level'));
+    expect(ctx.warn).toHaveBeenCalledWith(
+      expect.stringContaining('No battery level'),
+    );
     expect(ctx.skipped).toHaveBeenCalled();
     expect(ctx.complete).not.toHaveBeenCalled();
   });
@@ -51,7 +53,9 @@ describe('BatteryLevelJob', () => {
     jobConfigService.findNextHigher.mockResolvedValue(null);
     await job.execute();
     expect(ctx.setCurrentValue).toHaveBeenCalledWith('80');
-    expect(ctx.info).toHaveBeenCalledWith(expect.stringContaining('above all configured thresholds'));
+    expect(ctx.info).toHaveBeenCalledWith(
+      expect.stringContaining('above all configured thresholds'),
+    );
     expect(ctx.complete).toHaveBeenCalled();
     expect(ctx.needsNotification).not.toHaveBeenCalled();
   });
@@ -63,18 +67,26 @@ describe('BatteryLevelJob', () => {
     await job.execute();
     expect(ctx.setCurrentValue).toHaveBeenCalledWith('20');
     expect(ctx.setJobConfiguration).toHaveBeenCalledWith(config);
-    expect(ctx.warn).toHaveBeenCalledWith(expect.stringContaining('at or below threshold'));
-    expect(ctx.needsNotification).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'Low battery warning!',
-      message: expect.stringContaining('20%'),
-    }));
+    expect(ctx.warn).toHaveBeenCalledWith(
+      expect.stringContaining('at or below threshold'),
+    );
+    expect(ctx.needsNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Low battery warning!',
+        message: expect.stringContaining('20%'),
+      }),
+    );
     expect(ctx.complete).toHaveBeenCalled();
   });
 
   it('fails on unexpected error', async () => {
-    nightscout.getLatestBatteryLevel.mockRejectedValue(new Error('network error'));
+    nightscout.getLatestBatteryLevel.mockRejectedValue(
+      new Error('network error'),
+    );
     await job.execute();
-    expect(ctx.error).toHaveBeenCalledWith(expect.stringContaining('network error'));
+    expect(ctx.error).toHaveBeenCalledWith(
+      expect.stringContaining('network error'),
+    );
     expect(ctx.fail).toHaveBeenCalled();
   });
 
@@ -86,6 +98,8 @@ describe('BatteryLevelJob', () => {
   it('creates execution with correct key', async () => {
     nightscout.getLatestBatteryLevel.mockResolvedValue(null);
     await job.execute();
-    expect(jobExecutionService.create).toHaveBeenCalledWith(BATTERY_LEVEL_JOB_KEY);
+    expect(jobExecutionService.create).toHaveBeenCalledWith(
+      BATTERY_LEVEL_JOB_KEY,
+    );
   });
 });

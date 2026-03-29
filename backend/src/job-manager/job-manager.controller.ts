@@ -1,5 +1,10 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JobManagerService } from './job-manager.service';
 import { JOB_TYPE_KEYS, type JobTypeKey } from '../job-type/job-type.registry';
 
@@ -21,7 +26,9 @@ export class JobManagerController {
   async trigger(@Body() body: TriggerJobsDto): Promise<void> {
     const keys =
       body.keys && body.keys.length > 0
-        ? body.keys.filter((k) => (JOB_TYPE_KEYS as readonly string[]).includes(k))
+        ? body.keys.filter((k) =>
+            (JOB_TYPE_KEYS as readonly string[]).includes(k),
+          )
         : [...JOB_TYPE_KEYS];
 
     await Promise.all(keys.map((key) => this.jobManager.run(key)));

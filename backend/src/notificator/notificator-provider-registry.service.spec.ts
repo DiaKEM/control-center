@@ -22,7 +22,9 @@ describe('NotificatorProviderRegistryService', () => {
       NOTIFICATOR_PROVIDER_STORE.set('pushover', FakeProvider);
       moduleRef.get.mockReturnValue(fakeInstance);
       const result = service.resolve('pushover');
-      expect(moduleRef.get).toHaveBeenCalledWith(FakeProvider, { strict: false });
+      expect(moduleRef.get).toHaveBeenCalledWith(FakeProvider, {
+        strict: false,
+      });
       expect(result).toBe(fakeInstance);
     });
 

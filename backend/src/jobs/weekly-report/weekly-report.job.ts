@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JobType } from '../../job-type/job-type.decorator';
 import { JobExecutionService } from '../../job-execution/job-execution.service';
-import { GlucoseReportService, GlucoseReportStats } from '../../glucose-report/glucose-report.service';
+import {
+  GlucoseReportService,
+  GlucoseReportStats,
+} from '../../glucose-report/glucose-report.service';
 import { GlucoseChartService } from '../../glucose-report/glucose-chart.service';
 import { ReportJobBase } from '../../glucose-report/report-job-base';
 import { JobConfigurationService } from '../../job-configuration/job-configuration.service';
@@ -16,24 +19,36 @@ export class WeeklyReportJob extends ReportJobBase {
     jobConfigService: JobConfigurationService,
     private readonly glucoseChart: GlucoseChartService,
   ) {
-    super(WEEKLY_REPORT_JOB_KEY, jobExecutionService, glucoseReport, jobConfigService);
+    super(
+      WEEKLY_REPORT_JOB_KEY,
+      jobExecutionService,
+      glucoseReport,
+      jobConfigService,
+    );
   }
 
-  protected get reportTitle(): string { return 'Weekly Report'; }
+  protected get reportTitle(): string {
+    return 'Weekly Report';
+  }
   protected get reportPeriodLabel(): string {
     const to = new Date();
     const from = new Date(to);
     from.setDate(from.getDate() - 7);
     from.setHours(0, 0, 0, 0);
-    const fmt = (d: Date) => d.toLocaleDateString(undefined, { dateStyle: 'medium' });
+    const fmt = (d: Date) =>
+      d.toLocaleDateString(undefined, { dateStyle: 'medium' });
     return `Weekly (${fmt(from)} – ${fmt(to)})`;
   }
 
-  protected async getImageBuffer(stats: GlucoseReportStats): Promise<Buffer | undefined> {
+  protected async getImageBuffer(
+    stats: GlucoseReportStats,
+  ): Promise<Buffer | undefined> {
     return this.glucoseChart.renderDonut(stats, this.reportTitle);
   }
 
-  protected async getAdditionalImages(stats: GlucoseReportStats): Promise<Array<{ buffer: Buffer; caption: string }>> {
+  protected async getAdditionalImages(
+    stats: GlucoseReportStats,
+  ): Promise<Array<{ buffer: Buffer; caption: string }>> {
     const avgCaption = 'Daily Averages – Last 7 Days';
     const avgBuffer = await this.glucoseChart.renderLineChart(
       stats.dailyAverages,
@@ -43,7 +58,8 @@ export class WeeklyReportJob extends ReportJobBase {
     );
 
     const tirCaption = 'Daily Time in Range – Last 7 Days';
-    const inRangeName = stats.ranges.find((r) => r.name === 'In Range')?.name ?? 'In Range';
+    const inRangeName =
+      stats.ranges.find((r) => r.name === 'In Range')?.name ?? 'In Range';
     const tirBuffer = await this.glucoseChart.renderTirLineChart(
       stats.dailyTir,
       inRangeName,

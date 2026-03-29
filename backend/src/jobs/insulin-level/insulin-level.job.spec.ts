@@ -41,7 +41,9 @@ describe('InsulinLevelJob', () => {
   it('skips when insulin level is null', async () => {
     nightscout.getLatestInsulinLevel.mockResolvedValue(null);
     await job.execute();
-    expect(ctx.warn).toHaveBeenCalledWith(expect.stringContaining('No insulin level'));
+    expect(ctx.warn).toHaveBeenCalledWith(
+      expect.stringContaining('No insulin level'),
+    );
     expect(ctx.skipped).toHaveBeenCalled();
     expect(ctx.complete).not.toHaveBeenCalled();
   });
@@ -51,7 +53,9 @@ describe('InsulinLevelJob', () => {
     jobConfigService.findNextHigher.mockResolvedValue(null);
     await job.execute();
     expect(ctx.setCurrentValue).toHaveBeenCalledWith('150.0');
-    expect(ctx.info).toHaveBeenCalledWith(expect.stringContaining('above all configured thresholds'));
+    expect(ctx.info).toHaveBeenCalledWith(
+      expect.stringContaining('above all configured thresholds'),
+    );
     expect(ctx.complete).toHaveBeenCalled();
     expect(ctx.needsNotification).not.toHaveBeenCalled();
   });
@@ -63,25 +67,33 @@ describe('InsulinLevelJob', () => {
     await job.execute();
     expect(ctx.setCurrentValue).toHaveBeenCalledWith('30.5');
     expect(ctx.setJobConfiguration).toHaveBeenCalledWith(config);
-    expect(ctx.warn).toHaveBeenCalledWith(expect.stringContaining('at or below threshold'));
-    expect(ctx.needsNotification).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'Low insulin warning!',
-      message: expect.stringContaining('30.5U'),
-    }));
+    expect(ctx.warn).toHaveBeenCalledWith(
+      expect.stringContaining('at or below threshold'),
+    );
+    expect(ctx.needsNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Low insulin warning!',
+        message: expect.stringContaining('30.5U'),
+      }),
+    );
     expect(ctx.complete).toHaveBeenCalled();
   });
 
   it('fails on unexpected error', async () => {
     nightscout.getLatestInsulinLevel.mockRejectedValue(new Error('api error'));
     await job.execute();
-    expect(ctx.error).toHaveBeenCalledWith(expect.stringContaining('api error'));
+    expect(ctx.error).toHaveBeenCalledWith(
+      expect.stringContaining('api error'),
+    );
     expect(ctx.fail).toHaveBeenCalled();
   });
 
   it('creates execution with correct key', async () => {
     nightscout.getLatestInsulinLevel.mockResolvedValue(null);
     await job.execute();
-    expect(jobExecutionService.create).toHaveBeenCalledWith(INSULIN_LEVEL_JOB_KEY);
+    expect(jobExecutionService.create).toHaveBeenCalledWith(
+      INSULIN_LEVEL_JOB_KEY,
+    );
   });
 
   it('handles non-Error throws', async () => {

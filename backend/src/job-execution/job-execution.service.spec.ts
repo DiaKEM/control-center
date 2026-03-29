@@ -29,12 +29,14 @@ describe('JobExecutionService', () => {
       const doc = { _id: { toString: () => 'id-1' }, status: 'running' };
       model.create.mockResolvedValue(doc);
       const result = await service.create('pump-age');
-      expect(model.create).toHaveBeenCalledWith(expect.objectContaining({
-        jobTypeKey: 'pump-age',
-        status: 'running',
-        needsNotification: false,
-        logs: [],
-      }));
+      expect(model.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          jobTypeKey: 'pump-age',
+          status: 'running',
+          needsNotification: false,
+          logs: [],
+        }),
+      );
       expect(result).toBeInstanceOf(JobExecutionContext);
     });
   });
@@ -64,7 +66,9 @@ describe('JobExecutionService', () => {
 
     it('applies jobConfiguration filter', async () => {
       await service.find({ jobConfiguration: 'cfg-id' });
-      expect(model.find).toHaveBeenCalledWith({ 'jobConfiguration.id': 'cfg-id' });
+      expect(model.find).toHaveBeenCalledWith({
+        'jobConfiguration.id': 'cfg-id',
+      });
     });
 
     it('applies from/to date filter', async () => {
@@ -102,7 +106,11 @@ describe('JobExecutionService', () => {
     it('queries by jobTypeKey and jobConfiguration', async () => {
       const doc = { _id: 'exec-1' };
       execFn.mockResolvedValue(doc);
-      model.findOne.mockReturnValue({ sort: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(doc) }) });
+      model.findOne.mockReturnValue({
+        sort: jest
+          .fn()
+          .mockReturnValue({ exec: jest.fn().mockResolvedValue(doc) }),
+      });
       const result = await service.findLastJobExecution('pump-age', 'cfg-1');
       expect(model.findOne).toHaveBeenCalledWith({
         jobTypeKey: 'pump-age',

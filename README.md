@@ -1,6 +1,8 @@
 # Diakem Notify control center
 
 [![CI](https://github.com/DiaKEM/control-center/actions/workflows/ci.yml/badge.svg)](https://github.com/DiaKEM/control-center/actions/workflows/ci.yml)
+[![Backend Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/khskekec/94bfafb7e8622c7446067ba5b6d7e255/raw/diakem-backend-coverage.json)](https://github.com/DiaKEM/control-center/actions/workflows/ci.yml)
+[![Frontend Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/khskekec/82dab7be9f7766c4a9303630bdb81d47/raw/diakem-frontend-coverage.json)](https://github.com/DiaKEM/control-center/actions/workflows/ci.yml)
 [![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io)
 [![Node 22](https://img.shields.io/badge/node-22-brightgreen.svg)](https://nodejs.org)
 

@@ -1,4 +1,13 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -22,14 +31,35 @@ export class JobExecutionController {
   @Get()
   @ApiOperation({
     summary: 'List job executions',
-    description: 'Returns job executions, optionally filtered. Sorted by startedAt descending.',
+    description:
+      'Returns job executions, optionally filtered. Sorted by startedAt descending.',
   })
   @ApiQuery({ name: 'jobTypeKey', required: false, example: 'pump-age' })
-  @ApiQuery({ name: 'status', required: false, enum: ['running', 'success', 'skipped', 'failed'] })
-  @ApiQuery({ name: 'from', required: false, description: 'ISO date — executions started at or after this time' })
-  @ApiQuery({ name: 'to', required: false, description: 'ISO date — executions started at or before this time' })
-  @ApiQuery({ name: 'needsNotification', required: false, enum: ['true', 'false'] })
-  @ApiQuery({ name: 'limit', required: false, description: 'Max records to return (default 100)' })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['running', 'success', 'skipped', 'failed'],
+  })
+  @ApiQuery({
+    name: 'from',
+    required: false,
+    description: 'ISO date — executions started at or after this time',
+  })
+  @ApiQuery({
+    name: 'to',
+    required: false,
+    description: 'ISO date — executions started at or before this time',
+  })
+  @ApiQuery({
+    name: 'needsNotification',
+    required: false,
+    enum: ['true', 'false'],
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Max records to return (default 100)',
+  })
   @ApiOkResponse({ type: [JobExecution] })
   findAll(
     @Query('jobTypeKey') jobTypeKey?: string,
@@ -45,9 +75,11 @@ export class JobExecutionController {
       from: from ? new Date(from) : undefined,
       to: to ? new Date(to) : undefined,
       needsNotification:
-        needsNotification === 'true' ? true
-        : needsNotification === 'false' ? false
-        : undefined,
+        needsNotification === 'true'
+          ? true
+          : needsNotification === 'false'
+            ? false
+            : undefined,
       limit: limit ? Number(limit) : undefined,
     });
   }
@@ -64,9 +96,15 @@ export class JobExecutionController {
 
   @Delete()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Delete all job executions matching the given filters' })
+  @ApiOperation({
+    summary: 'Delete all job executions matching the given filters',
+  })
   @ApiQuery({ name: 'jobTypeKey', required: false })
-  @ApiQuery({ name: 'status', required: false, enum: ['running', 'success', 'skipped', 'failed'] })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['running', 'success', 'skipped', 'failed'],
+  })
   @ApiQuery({ name: 'from', required: false })
   @ApiQuery({ name: 'to', required: false })
   @ApiOkResponse()

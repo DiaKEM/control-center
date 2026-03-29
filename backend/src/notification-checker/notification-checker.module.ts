@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { JobExecution, JobExecutionSchema } from '../job-execution/job-execution.schema';
+import {
+  JobExecution,
+  JobExecutionSchema,
+} from '../job-execution/job-execution.schema';
 import { NotificationCheckerService } from './notification-checker.service';
 
 @Module({

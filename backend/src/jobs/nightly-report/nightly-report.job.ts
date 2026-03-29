@@ -20,7 +20,12 @@ export class NightlyReportJob extends ReportJobBase {
     jobConfigService: JobConfigurationService,
     private readonly glucoseChart: GlucoseChartService,
   ) {
-    super(NIGHTLY_REPORT_JOB_KEY, jobExecutionService, glucoseReport, jobConfigService);
+    super(
+      NIGHTLY_REPORT_JOB_KEY,
+      jobExecutionService,
+      glucoseReport,
+      jobConfigService,
+    );
   }
 
   protected get reportTitle(): string {

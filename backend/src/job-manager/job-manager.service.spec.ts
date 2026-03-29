@@ -14,7 +14,11 @@ describe('JobManagerService', () => {
   let jobTypeRegistry: { getRegisteredKeys: jest.Mock; resolve: jest.Mock };
   let notificationManager: { sendMessage: jest.Mock };
   let notificationChecker: { check: jest.Mock };
-  let mockCtx: { execute: jest.Mock; get: jest.Mock; setNotificationSent: jest.Mock };
+  let mockCtx: {
+    execute: jest.Mock;
+    get: jest.Mock;
+    setNotificationSent: jest.Mock;
+  };
 
   beforeEach(() => {
     mockCtx = {
@@ -23,10 +27,16 @@ describe('JobManagerService', () => {
       setNotificationSent: jest.fn().mockResolvedValue(undefined),
     };
     jobTypeRegistry = {
-      getRegisteredKeys: jest.fn().mockReturnValue(['pump-age', 'battery-level']),
-      resolve: jest.fn().mockReturnValue({ execute: jest.fn().mockResolvedValue(mockCtx) }),
+      getRegisteredKeys: jest
+        .fn()
+        .mockReturnValue(['pump-age', 'battery-level']),
+      resolve: jest
+        .fn()
+        .mockReturnValue({ execute: jest.fn().mockResolvedValue(mockCtx) }),
     };
-    notificationManager = { sendMessage: jest.fn().mockResolvedValue(undefined) };
+    notificationManager = {
+      sendMessage: jest.fn().mockResolvedValue(undefined),
+    };
     notificationChecker = { check: jest.fn().mockResolvedValue([]) };
     service = new JobManagerService(
       jobTypeRegistry as any,
@@ -52,32 +62,38 @@ describe('JobManagerService', () => {
     });
 
     it('skips notification when no jobConfiguration', async () => {
-      mockCtx.get.mockResolvedValue(makeCtxDoc({
-        needsNotification: true,
-        jobConfiguration: null,
-        notification: { title: 'T', message: 'M' },
-      }));
+      mockCtx.get.mockResolvedValue(
+        makeCtxDoc({
+          needsNotification: true,
+          jobConfiguration: null,
+          notification: { title: 'T', message: 'M' },
+        }),
+      );
       await service.run('pump-age');
       expect(notificationManager.sendMessage).not.toHaveBeenCalled();
     });
 
     it('skips notification when no notification payload', async () => {
-      mockCtx.get.mockResolvedValue(makeCtxDoc({
-        needsNotification: true,
-        jobConfiguration: { provider: ['pushover'] },
-        notification: null,
-      }));
+      mockCtx.get.mockResolvedValue(
+        makeCtxDoc({
+          needsNotification: true,
+          jobConfiguration: { provider: ['pushover'] },
+          notification: null,
+        }),
+      );
       await service.run('pump-age');
       expect(notificationManager.sendMessage).not.toHaveBeenCalled();
     });
 
     it('skips notification when checker says not due', async () => {
       notificationChecker.check.mockResolvedValue([]);
-      mockCtx.get.mockResolvedValue(makeCtxDoc({
-        needsNotification: true,
-        jobConfiguration: { provider: ['pushover'] },
-        notification: { title: 'T', message: 'M' },
-      }));
+      mockCtx.get.mockResolvedValue(
+        makeCtxDoc({
+          needsNotification: true,
+          jobConfiguration: { provider: ['pushover'] },
+          notification: { title: 'T', message: 'M' },
+        }),
+      );
       await service.run('pump-age');
       expect(notificationManager.sendMessage).not.toHaveBeenCalled();
     });
@@ -86,13 +102,18 @@ describe('JobManagerService', () => {
       const config = { provider: ['pushover'] };
       const payload = { title: 'T', message: 'M' };
       notificationChecker.check.mockResolvedValue([{ intervalHours: 4 }]);
-      mockCtx.get.mockResolvedValue(makeCtxDoc({
-        needsNotification: true,
-        jobConfiguration: config,
-        notification: payload,
-      }));
+      mockCtx.get.mockResolvedValue(
+        makeCtxDoc({
+          needsNotification: true,
+          jobConfiguration: config,
+          notification: payload,
+        }),
+      );
       await service.run('pump-age');
-      expect(notificationManager.sendMessage).toHaveBeenCalledWith(config.provider, payload);
+      expect(notificationManager.sendMessage).toHaveBeenCalledWith(
+        config.provider,
+        payload,
+      );
       expect(mockCtx.setNotificationSent).toHaveBeenCalled();
     });
 

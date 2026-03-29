@@ -5,7 +5,12 @@ import { UsersService } from './users.service';
 import { User } from './user.schema';
 import * as bcrypt from 'bcryptjs';
 
-const mockUser = { username: 'alice', password: 'hashed', roles: ['user'], save: jest.fn() };
+const mockUser = {
+  username: 'alice',
+  password: 'hashed',
+  roles: ['user'],
+  save: jest.fn(),
+};
 
 const mockModel = {
   findOne: jest.fn(),
@@ -41,13 +46,17 @@ describe('UsersService', () => {
 
   describe('findByUsername', () => {
     it('returns user when found', async () => {
-      ModelConstructor.findOne.mockReturnValue({ exec: () => Promise.resolve(mockUser) });
+      ModelConstructor.findOne.mockReturnValue({
+        exec: () => Promise.resolve(mockUser),
+      });
       const result = await service.findByUsername('alice');
       expect(result).toBe(mockUser);
     });
 
     it('returns null when not found', async () => {
-      ModelConstructor.findOne.mockReturnValue({ exec: () => Promise.resolve(null) });
+      ModelConstructor.findOne.mockReturnValue({
+        exec: () => Promise.resolve(null),
+      });
       const result = await service.findByUsername('unknown');
       expect(result).toBeNull();
     });
@@ -55,12 +64,18 @@ describe('UsersService', () => {
 
   describe('create', () => {
     it('throws ConflictException when username already exists', async () => {
-      ModelConstructor.findOne.mockReturnValue({ exec: () => Promise.resolve(mockUser) });
-      await expect(service.create('alice', 'pass')).rejects.toThrow(ConflictException);
+      ModelConstructor.findOne.mockReturnValue({
+        exec: () => Promise.resolve(mockUser),
+      });
+      await expect(service.create('alice', 'pass')).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('creates user with hashed password', async () => {
-      ModelConstructor.findOne.mockReturnValue({ exec: () => Promise.resolve(null) });
+      ModelConstructor.findOne.mockReturnValue({
+        exec: () => Promise.resolve(null),
+      });
       await service.create('bob', 'password');
       expect(bcrypt.hash).toHaveBeenCalledWith('password', 10);
     });

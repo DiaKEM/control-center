@@ -20,8 +20,15 @@ describe('JobConfigurationController', () => {
       update: jest.fn(),
       delete: jest.fn(),
     };
-    jobTypeRegistry = { getRegisteredKeys: jest.fn().mockReturnValue(['pump-age', 'battery-level']) };
-    controller = new JobConfigurationController(service as any, jobTypeRegistry as any);
+    jobTypeRegistry = {
+      getRegisteredKeys: jest
+        .fn()
+        .mockReturnValue(['pump-age', 'battery-level']),
+    };
+    controller = new JobConfigurationController(
+      service as any,
+      jobTypeRegistry as any,
+    );
   });
 
   describe('findAll()', () => {
@@ -69,7 +76,9 @@ describe('JobConfigurationController', () => {
 
     it('throws NotFoundException when document not found', async () => {
       service.update.mockResolvedValue(null);
-      await expect(controller.update('nonexistent', {} as any)).rejects.toThrow(NotFoundException);
+      await expect(controller.update('nonexistent', {} as any)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('throws BadRequestException when updating to unknown jobTypeKey', async () => {
@@ -81,7 +90,9 @@ describe('JobConfigurationController', () => {
     it('allows updating with a valid jobTypeKey', async () => {
       const updated = { _id: '1', jobTypeKey: 'battery-level' };
       service.update.mockResolvedValue(updated);
-      const result = await controller.update('1', { jobTypeKey: 'battery-level' } as any);
+      const result = await controller.update('1', {
+        jobTypeKey: 'battery-level',
+      } as any);
       expect(result).toBe(updated);
     });
 

@@ -6,7 +6,12 @@ import { GlucoseReportModule } from '../../glucose-report/glucose-report.module'
 import { BatteryLevelJob } from './battery-level.job';
 
 @Module({
-  imports: [NightscoutModule, JobConfigurationModule, JobExecutionModule, GlucoseReportModule],
+  imports: [
+    NightscoutModule,
+    JobConfigurationModule,
+    JobExecutionModule,
+    GlucoseReportModule,
+  ],
   providers: [BatteryLevelJob],
   exports: [BatteryLevelJob],
 })

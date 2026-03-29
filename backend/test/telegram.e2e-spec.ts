@@ -35,7 +35,8 @@ describe('TelegramApi (e2e)', () => {
         })
         .compile();
 
-      const invalidService = moduleFixture.get<TelegramService>(TelegramService);
+      const invalidService =
+        moduleFixture.get<TelegramService>(TelegramService);
 
       await expect(invalidService.isConnected()).resolves.toBe(false);
     });
@@ -120,9 +121,7 @@ describe('TelegramApi (e2e)', () => {
     it('should send a message with an inline keyboard', async () => {
       const msg = await service.sendMessage('e2e test — inline keyboard', {
         reply_markup: {
-          inline_keyboard: [
-            [{ text: 'Visit', url: 'https://example.com' }],
-          ],
+          inline_keyboard: [[{ text: 'Visit', url: 'https://example.com' }]],
         },
       });
 

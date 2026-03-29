@@ -1,7 +1,10 @@
 import { JobTypeBase } from '../job-type/job-type-base';
 import { JobExecutionContext } from '../job-execution/job-execution.context';
 import { JobExecutionService } from '../job-execution/job-execution.service';
-import { GlucoseReportService, GlucoseReportStats } from './glucose-report.service';
+import {
+  GlucoseReportService,
+  GlucoseReportStats,
+} from './glucose-report.service';
 import { JobConfigurationService } from '../job-configuration/job-configuration.service';
 
 export abstract class ReportJobBase extends JobTypeBase {
@@ -22,13 +25,17 @@ export abstract class ReportJobBase extends JobTypeBase {
 
   // Override in subclasses to attach an image to the notification.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected async getImageBuffer(_stats: GlucoseReportStats): Promise<Buffer | undefined> {
+  protected async getImageBuffer(
+    _stats: GlucoseReportStats,
+  ): Promise<Buffer | undefined> {
     return undefined;
   }
 
   // Override in subclasses to send additional image-only messages after the main report.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected async getAdditionalImages(_stats: GlucoseReportStats): Promise<Array<{ buffer: Buffer; caption: string }>> {
+  protected async getAdditionalImages(
+    _stats: GlucoseReportStats,
+  ): Promise<Array<{ buffer: Buffer; caption: string }>> {
     return [];
   }
 
@@ -75,7 +82,8 @@ export abstract class ReportJobBase extends JobTypeBase {
       const additionalImages = await this.getAdditionalImages(stats);
 
       const imageBuffers: Array<{ data: string; caption?: string }> = [];
-      if (mainBuffer) imageBuffers.push({ data: mainBuffer.toString('base64') });
+      if (mainBuffer)
+        imageBuffers.push({ data: mainBuffer.toString('base64') });
       for (const { buffer, caption } of additionalImages) {
         imageBuffers.push({ data: buffer.toString('base64'), caption });
       }
@@ -87,7 +95,9 @@ export abstract class ReportJobBase extends JobTypeBase {
         ...(imageBuffers.length ? { imageBuffers } : {}),
       });
 
-      await ctx.info(`Report queued for sending via ${config.provider.join(', ')}`);
+      await ctx.info(
+        `Report queued for sending via ${config.provider.join(', ')}`,
+      );
       await ctx.complete();
     } catch (err: unknown) {
       await ctx.error(err?.toString() || 'Unknown error');

@@ -1,27 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import * as vega from 'vega';
 import sharp from 'sharp';
-import type { DailyAverage, DailyTir, GlucoseReportStats } from './glucose-report.service';
+import type {
+  DailyAverage,
+  DailyTir,
+  GlucoseReportStats,
+} from './glucose-report.service';
 
 const RANGE_COLORS: Record<string, string> = {
   'Very Low': '#7b1d1d',
-  'Low':      '#e67e22',
+  Low: '#e67e22',
   'In Range': '#27ae60',
-  'High':     '#f39c12',
-  'Very High':'#c0392b',
+  High: '#f39c12',
+  'Very High': '#c0392b',
 };
 
 const RANGE_BAND_COLORS: Record<string, string> = {
   'Very Low': '#ffcdd2',
-  'Low':      '#ffe0b2',
+  Low: '#ffe0b2',
   'In Range': '#c8e6c9',
-  'High':     '#fff9c4',
-  'Very High':'#f8bbd0',
+  High: '#fff9c4',
+  'Very High': '#f8bbd0',
 };
 
 @Injectable()
 export class GlucoseChartService {
-  async renderDonut(stats: GlucoseReportStats, title = 'Report'): Promise<Buffer> {
+  async renderDonut(
+    stats: GlucoseReportStats,
+    title = 'Report',
+  ): Promise<Buffer> {
     const tableValues = stats.ranges.map((r) => ({
       label: `${r.name}: ${r.percentage}%`,
       value: r.percentage,
@@ -139,7 +146,10 @@ export class GlucoseChartService {
   ): Promise<Buffer> {
     // Format dates as "Mar 14" for axis labels
     const chartData = dailyAverages.map((d) => ({
-      date: new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      date: new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      }),
       average: d.average,
     }));
 
@@ -288,14 +298,17 @@ export class GlucoseChartService {
     title: string,
   ): Promise<Buffer> {
     const chartData = dailyTir.map((d) => ({
-      date: new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      date: new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      }),
       tir: d.tir,
     }));
 
     // Clinical TIR quality bands (standard thresholds)
     const bands = [
-      { y0: 0,  y1: 50,  color: '#ffcdd2', label: 'Poor' },
-      { y0: 50, y1: 70,  color: '#fff9c4', label: 'Acceptable' },
+      { y0: 0, y1: 50, color: '#ffcdd2', label: 'Poor' },
+      { y0: 50, y1: 70, color: '#fff9c4', label: 'Acceptable' },
       { y0: 70, y1: 100, color: '#c8e6c9', label: 'Target' },
     ];
 
@@ -449,7 +462,11 @@ export class GlucoseChartService {
   ): Promise<Buffer> {
     const chartData = monthlyAverages.map((d) => {
       const [year, month] = d.date.split('-');
-      const label = new Date(Number(year), Number(month) - 1, 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      const label = new Date(
+        Number(year),
+        Number(month) - 1,
+        1,
+      ).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
       return { date: label, average: d.average };
     });
 
@@ -597,7 +614,11 @@ export class GlucoseChartService {
     const sorted = [...history].reverse();
 
     const chartData = sorted.map((p) => ({
-      time: p.createdAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      time: p.createdAt.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }),
       level: p.level,
     }));
 
@@ -609,9 +630,9 @@ export class GlucoseChartService {
     const yMax = Math.min(100, Math.ceil(Math.max(...levels)) + 5);
 
     const bands = [
-      { y0: Math.max(0, yMin),   y1: Math.min(20, yMax),  color: '#ffcdd2' }, // critical
-      { y0: Math.max(20, yMin),  y1: Math.min(50, yMax),  color: '#fff9c4' }, // low
-      { y0: Math.max(50, yMin),  y1: Math.min(100, yMax), color: '#c8e6c9' }, // good
+      { y0: Math.max(0, yMin), y1: Math.min(20, yMax), color: '#ffcdd2' }, // critical
+      { y0: Math.max(20, yMin), y1: Math.min(50, yMax), color: '#fff9c4' }, // low
+      { y0: Math.max(50, yMin), y1: Math.min(100, yMax), color: '#c8e6c9' }, // good
     ].filter((b) => b.y1 > b.y0);
 
     // Line turns green while charging
@@ -789,13 +810,17 @@ export class GlucoseChartService {
   ): Promise<Buffer> {
     const chartData = monthlyTir.map((d) => {
       const [year, month] = d.date.split('-');
-      const label = new Date(Number(year), Number(month) - 1, 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      const label = new Date(
+        Number(year),
+        Number(month) - 1,
+        1,
+      ).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
       return { date: label, tir: d.tir };
     });
 
     const bands = [
-      { y0: 0,  y1: 50,  color: '#ffcdd2', label: 'Poor' },
-      { y0: 50, y1: 70,  color: '#fff9c4', label: 'Acceptable' },
+      { y0: 0, y1: 50, color: '#ffcdd2', label: 'Poor' },
+      { y0: 50, y1: 70, color: '#fff9c4', label: 'Acceptable' },
       { y0: 70, y1: 100, color: '#c8e6c9', label: 'Target' },
     ];
 

@@ -45,14 +45,17 @@ export class SchedulerService implements OnModuleInit {
     this.schedulerRegistry.addCronJob(JOB_NAME, job);
     job.start();
 
-    this.logger.log(`Scheduler running with expression: ${effectiveExpression}`);
+    this.logger.log(
+      `Scheduler running with expression: ${effectiveExpression}`,
+    );
   }
 
   getEffectiveExpression(): string {
     try {
       // CronJob doesn't expose the pattern directly, so read from the registry
       const job = this.schedulerRegistry.getCronJob(JOB_NAME);
-      return (job as unknown as { cronTime: { source: string } }).cronTime.source;
+      return (job as unknown as { cronTime: { source: string } }).cronTime
+        .source;
     } catch {
       return DEFAULT_CRON;
     }

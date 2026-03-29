@@ -41,47 +41,71 @@ describe('PumpAgeJob', () => {
   it('skips when no pump change found', async () => {
     nightscout.getLastPumpChange.mockResolvedValue(null);
     await job.execute();
-    expect(ctx.warn).toHaveBeenCalledWith(expect.stringContaining('No pump change'));
+    expect(ctx.warn).toHaveBeenCalledWith(
+      expect.stringContaining('No pump change'),
+    );
     expect(ctx.skipped).toHaveBeenCalled();
   });
 
   it('skips when elapsedDays is undefined', async () => {
-    nightscout.getLastPumpChange.mockResolvedValue({ treatment: {}, elapsedDays: undefined });
+    nightscout.getLastPumpChange.mockResolvedValue({
+      treatment: {},
+      elapsedDays: undefined,
+    });
     await job.execute();
-    expect(ctx.warn).toHaveBeenCalledWith(expect.stringContaining('no elapsed days'));
+    expect(ctx.warn).toHaveBeenCalledWith(
+      expect.stringContaining('no elapsed days'),
+    );
     expect(ctx.skipped).toHaveBeenCalled();
   });
 
   it('completes without notification when no config matches', async () => {
-    nightscout.getLastPumpChange.mockResolvedValue({ treatment: {}, elapsedDays: 1.5 });
+    nightscout.getLastPumpChange.mockResolvedValue({
+      treatment: {},
+      elapsedDays: 1.5,
+    });
     jobConfigService.findNextLower.mockResolvedValue(null);
     await job.execute();
     expect(ctx.setCurrentValue).toHaveBeenCalledWith('1.50');
-    expect(ctx.info).toHaveBeenCalledWith(expect.stringContaining('No configuration matches'));
+    expect(ctx.info).toHaveBeenCalledWith(
+      expect.stringContaining('No configuration matches'),
+    );
     expect(ctx.complete).toHaveBeenCalled();
     expect(ctx.needsNotification).not.toHaveBeenCalled();
   });
 
   it('notifies and warns when pump age exceeds threshold', async () => {
-    nightscout.getLastPumpChange.mockResolvedValue({ treatment: {}, elapsedDays: 5.0 });
+    nightscout.getLastPumpChange.mockResolvedValue({
+      treatment: {},
+      elapsedDays: 5.0,
+    });
     const config = makeConfig(3);
     jobConfigService.findNextLower.mockResolvedValue(config);
     await job.execute();
     expect(ctx.setJobConfiguration).toHaveBeenCalledWith(config);
-    expect(ctx.warn).toHaveBeenCalledWith(expect.stringContaining('exceeds threshold'));
-    expect(ctx.needsNotification).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'Pump age alarm!',
-      message: expect.stringContaining('5.00d'),
-    }));
+    expect(ctx.warn).toHaveBeenCalledWith(
+      expect.stringContaining('exceeds threshold'),
+    );
+    expect(ctx.needsNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Pump age alarm!',
+        message: expect.stringContaining('5.00d'),
+      }),
+    );
     expect(ctx.complete).toHaveBeenCalled();
   });
 
   it('notifies with info when pump age is below threshold', async () => {
-    nightscout.getLastPumpChange.mockResolvedValue({ treatment: {}, elapsedDays: 2.0 });
+    nightscout.getLastPumpChange.mockResolvedValue({
+      treatment: {},
+      elapsedDays: 2.0,
+    });
     const config = makeConfig(3);
     jobConfigService.findNextLower.mockResolvedValue(config);
     await job.execute();
-    expect(ctx.info).toHaveBeenCalledWith(expect.stringContaining('below threshold'));
+    expect(ctx.info).toHaveBeenCalledWith(
+      expect.stringContaining('below threshold'),
+    );
     expect(ctx.needsNotification).toHaveBeenCalled();
     expect(ctx.complete).toHaveBeenCalled();
   });

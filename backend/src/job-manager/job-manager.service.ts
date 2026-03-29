@@ -61,8 +61,11 @@ export class JobManagerService {
         );
         await ctx.setNotificationSent();
       } catch (sendErr: unknown) {
-        const message = sendErr instanceof Error ? sendErr.message : String(sendErr);
-        this.logger.error(`Job "${key}" failed to send notification: ${message}`);
+        const message =
+          sendErr instanceof Error ? sendErr.message : String(sendErr);
+        this.logger.error(
+          `Job "${key}" failed to send notification: ${message}`,
+        );
         await ctx.error(`Failed to send notification: ${message}`);
         await ctx.fail();
         return;

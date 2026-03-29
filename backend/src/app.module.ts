@@ -39,10 +39,14 @@ import { SetupModule } from './setup/setup.module';
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => [{
-        rootPath: path.resolve(config.get<string>('STATIC_FRONTEND_PATH', '../frontend')),
-        exclude: ['/api/*path'],
-      }],
+      useFactory: (config: ConfigService) => [
+        {
+          rootPath: path.resolve(
+            config.get<string>('STATIC_FRONTEND_PATH', '../frontend'),
+          ),
+          exclude: ['/api/*path'],
+        },
+      ],
     }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],

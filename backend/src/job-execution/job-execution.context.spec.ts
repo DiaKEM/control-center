@@ -26,15 +26,21 @@ describe('JobExecutionContext', () => {
   describe('get()', () => {
     it('returns the document when found', async () => {
       const found = { _id: 'doc-id', status: 'running' };
-      model.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(found) });
+      model.findOne.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(found),
+      });
       const result = await ctx.get();
       expect(result).toBe(found);
       expect(model.findOne).toHaveBeenCalledWith({ _id: 'doc-id' });
     });
 
     it('throws when document not found', async () => {
-      model.findOne.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
-      await expect(ctx.get()).rejects.toThrow('Job execution not found: doc-id');
+      model.findOne.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      });
+      await expect(ctx.get()).rejects.toThrow(
+        'Job execution not found: doc-id',
+      );
     });
   });
 
@@ -43,7 +49,14 @@ describe('JobExecutionContext', () => {
       await ctx.info('test info');
       expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
         'doc-id',
-        expect.objectContaining({ $push: { logs: expect.objectContaining({ level: LogLevel.INFO, message: 'test info' }) } }),
+        expect.objectContaining({
+          $push: {
+            logs: expect.objectContaining({
+              level: LogLevel.INFO,
+              message: 'test info',
+            }),
+          },
+        }),
       );
     });
 
@@ -51,7 +64,9 @@ describe('JobExecutionContext', () => {
       await ctx.warn('test warn');
       expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
         'doc-id',
-        expect.objectContaining({ $push: { logs: expect.objectContaining({ level: LogLevel.WARNING }) } }),
+        expect.objectContaining({
+          $push: { logs: expect.objectContaining({ level: LogLevel.WARNING }) },
+        }),
       );
     });
 
@@ -59,7 +74,9 @@ describe('JobExecutionContext', () => {
       await ctx.error('test error');
       expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
         'doc-id',
-        expect.objectContaining({ $push: { logs: expect.objectContaining({ level: LogLevel.ERROR }) } }),
+        expect.objectContaining({
+          $push: { logs: expect.objectContaining({ level: LogLevel.ERROR }) },
+        }),
       );
     });
   });
@@ -67,70 +84,66 @@ describe('JobExecutionContext', () => {
   describe('field setters', () => {
     it('setCurrentValue() updates the field', async () => {
       await ctx.setCurrentValue('42');
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        'doc-id',
-        { $set: { currentValue: '42' } },
-      );
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith('doc-id', {
+        $set: { currentValue: '42' },
+      });
     });
 
     it('setStatus() updates status', async () => {
       await ctx.setStatus('success');
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        'doc-id',
-        { $set: { status: 'success' } },
-      );
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith('doc-id', {
+        $set: { status: 'success' },
+      });
     });
 
     it('setJobConfiguration() updates configuration', async () => {
       const config = { threshold: 3 } as any;
       await ctx.setJobConfiguration(config);
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        'doc-id',
-        { $set: { jobConfiguration: config } },
-      );
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith('doc-id', {
+        $set: { jobConfiguration: config },
+      });
     });
 
     it('setNotificationSent() sets notificationSentAt', async () => {
       await ctx.setNotificationSent();
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        'doc-id',
-        { $set: { notificationSentAt: expect.any(Date) } },
-      );
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith('doc-id', {
+        $set: { notificationSentAt: expect.any(Date) },
+      });
     });
   });
 
   describe('completion', () => {
     it('complete() sets status to success', async () => {
       await ctx.complete();
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        'doc-id',
-        { $set: { status: 'success', finishedAt: expect.any(Date) } },
-      );
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith('doc-id', {
+        $set: { status: 'success', finishedAt: expect.any(Date) },
+      });
     });
 
     it('fail() sets status to failed', async () => {
       await ctx.fail();
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        'doc-id',
-        { $set: { status: 'failed', finishedAt: expect.any(Date) } },
-      );
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith('doc-id', {
+        $set: { status: 'failed', finishedAt: expect.any(Date) },
+      });
     });
 
     it('skipped() sets status to skipped', async () => {
       await ctx.skipped();
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        'doc-id',
-        { $set: { status: 'skipped', finishedAt: expect.any(Date) } },
-      );
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith('doc-id', {
+        $set: { status: 'skipped', finishedAt: expect.any(Date) },
+      });
     });
 
     it('needsNotification() sets notification payload', async () => {
-      const payload = { title: 'Alert', message: 'msg', priority: NotificationPriority.HIGH };
+      const payload = {
+        title: 'Alert',
+        message: 'msg',
+        priority: NotificationPriority.HIGH,
+      };
       await ctx.needsNotification(payload);
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        'doc-id',
-        { $set: { needsNotification: true, notification: payload } },
-      );
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith('doc-id', {
+        $set: { needsNotification: true, notification: payload },
+      });
     });
   });
 });

@@ -162,9 +162,11 @@ export class PushoverService implements OnModuleInit {
   async reinitialize(): Promise<void> {
     const settings = await this.adminSettings.getSettings('pushover');
     this.appToken =
-      settings?.appToken || this.configService.get<string>('PUSHOVER_APP_TOKEN', '');
+      settings?.appToken ||
+      this.configService.get<string>('PUSHOVER_APP_TOKEN', '');
     this.userKey =
-      settings?.userKey || this.configService.get<string>('PUSHOVER_USER_KEY', '');
+      settings?.userKey ||
+      this.configService.get<string>('PUSHOVER_USER_KEY', '');
   }
 
   /**
@@ -222,7 +224,8 @@ export class PushoverService implements OnModuleInit {
     form.append('user', msg.user ?? this.userKey);
     form.append('message', msg.message);
     if (msg.title) form.append('title', msg.title);
-    if (msg.priority !== undefined) form.append('priority', String(msg.priority));
+    if (msg.priority !== undefined)
+      form.append('priority', String(msg.priority));
     if (msg.sound) form.append('sound', msg.sound);
     form.append('attachment', imageBuffer, {
       filename: 'chart.png',

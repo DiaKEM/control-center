@@ -9,7 +9,8 @@ export class JobTypeRegistryService {
 
   resolve(key: JobTypeKey): JobTypeBase {
     const cls = JOB_TYPE_STORE.get(key);
-    if (!cls) throw new NotFoundException(`No job type registered for key: "${key}"`);
+    if (!cls)
+      throw new NotFoundException(`No job type registered for key: "${key}"`);
     return this.moduleRef.get(cls as Type<JobTypeBase>, { strict: false });
   }
 

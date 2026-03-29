@@ -344,11 +344,9 @@ export class TelegramService implements OnModuleInit {
     if (options.disable_notification != null)
       form.append('disable_notification', String(options.disable_notification));
 
-    const { data } = await this.client.post<TelegramApiResponse<TelegramMessage>>(
-      '/sendPhoto',
-      form,
-      { headers: form.getHeaders() },
-    );
+    const { data } = await this.client.post<
+      TelegramApiResponse<TelegramMessage>
+    >('/sendPhoto', form, { headers: form.getHeaders() });
     return data.result;
   }
 
@@ -358,7 +356,11 @@ export class TelegramService implements OnModuleInit {
    */
   async sendMediaGroupBuffers(
     media: Array<{ buffer: Buffer; caption?: string }>,
-    options: { chat_id?: string | number; disable_notification?: boolean; reply_to_message_id?: number } = {},
+    options: {
+      chat_id?: string | number;
+      disable_notification?: boolean;
+      reply_to_message_id?: number;
+    } = {},
   ): Promise<TelegramMessage[]> {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const FormData = require('form-data') as typeof import('form-data');
@@ -371,16 +373,21 @@ export class TelegramService implements OnModuleInit {
 
     const mediaJson = media.map((item, i) => {
       const key = `photo${i}`;
-      form.append(key, item.buffer, { filename: `${key}.png`, contentType: 'image/png' });
-      return { type: 'photo', media: `attach://${key}`, ...(item.caption ? { caption: item.caption } : {}) };
+      form.append(key, item.buffer, {
+        filename: `${key}.png`,
+        contentType: 'image/png',
+      });
+      return {
+        type: 'photo',
+        media: `attach://${key}`,
+        ...(item.caption ? { caption: item.caption } : {}),
+      };
     });
     form.append('media', JSON.stringify(mediaJson));
 
-    const { data } = await this.client.post<TelegramApiResponse<TelegramMessage[]>>(
-      '/sendMediaGroup',
-      form,
-      { headers: form.getHeaders() },
-    );
+    const { data } = await this.client.post<
+      TelegramApiResponse<TelegramMessage[]>
+    >('/sendMediaGroup', form, { headers: form.getHeaders() });
     return data.result;
   }
 
