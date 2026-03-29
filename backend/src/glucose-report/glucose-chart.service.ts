@@ -441,6 +441,153 @@ export class GlucoseChartService {
     return sharp(Buffer.from(svgString)).png().toBuffer();
   }
 
+  async renderMonthlyAverageChart(
+    monthlyAverages: DailyAverage[],
+    unit: string,
+    ranges: Array<{ name: string; lowerLimit: number; upperLimit: number }>,
+    title: string,
+  ): Promise<Buffer> {
+    const chartData = monthlyAverages.map((d) => {
+      const [year, month] = d.date.split('-');
+      const label = new Date(Number(year), Number(month) - 1, 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      return { date: label, average: d.average };
+    });
+
+    const avgs = chartData.map((d) => d.average);
+    const limits = ranges.flatMap((r) => [r.lowerLimit, r.upperLimit]);
+    const yMin = Math.floor(Math.min(...avgs, ...limits) * 0.93);
+    const yMax = Math.ceil(Math.max(...avgs, ...limits) * 1.05);
+
+    const bandData = ranges.map((r) => ({
+      name: r.name,
+      y0: Math.max(r.lowerLimit, yMin),
+      y1: Math.min(r.upperLimit, yMax),
+      color: RANGE_BAND_COLORS[r.name] ?? '#f5f5f5',
+    }));
+
+    const spec: vega.Spec = {
+      $schema: 'https://vega.github.io/schema/vega/v5.json',
+      width: 520,
+      height: 280,
+      padding: { top: 10, left: 55, right: 20, bottom: 55 },
+      background: '#ffffff',
+      title: {
+        text: title,
+        fontSize: 14,
+        fontWeight: 'bold' as const,
+        color: '#333333',
+        anchor: 'middle' as const,
+        offset: 8,
+      },
+      data: [
+        { name: 'bands', values: bandData },
+        { name: 'points', values: chartData },
+      ],
+      scales: [
+        {
+          name: 'x',
+          type: 'point' as const,
+          domain: { data: 'points', field: 'date' },
+          range: 'width' as const,
+          padding: 0.4,
+        },
+        {
+          name: 'y',
+          type: 'linear' as const,
+          domain: [yMin, yMax],
+          range: 'height' as const,
+          nice: true,
+          zero: false,
+        },
+      ],
+      axes: [
+        {
+          orient: 'bottom' as const,
+          scale: 'x',
+          labelAngle: -45,
+          labelAlign: 'right' as const,
+          labelFontSize: 11,
+        },
+        {
+          orient: 'left' as const,
+          scale: 'y',
+          labelFontSize: 11,
+          title: unit,
+          titleFontSize: 12,
+          tickCount: 6,
+        },
+      ],
+      marks: [
+        {
+          type: 'rect' as const,
+          from: { data: 'bands' },
+          encode: {
+            update: {
+              x: { value: 0 },
+              x2: { signal: 'width' },
+              y: { scale: 'y', field: 'y1' },
+              y2: { scale: 'y', field: 'y0' },
+              fill: { field: 'color' },
+              opacity: { value: 0.7 },
+            },
+          },
+        },
+        {
+          type: 'line' as const,
+          from: { data: 'points' },
+          encode: {
+            update: {
+              x: { scale: 'x', field: 'date' },
+              y: { scale: 'y', field: 'average' },
+              stroke: { value: '#1565c0' },
+              strokeWidth: { value: 2.5 },
+              interpolate: { value: 'monotone' },
+            },
+          },
+        },
+        {
+          type: 'symbol' as const,
+          from: { data: 'points' },
+          encode: {
+            update: {
+              x: { scale: 'x', field: 'date' },
+              y: { scale: 'y', field: 'average' },
+              size: { value: 60 },
+              fill: { value: '#1565c0' },
+              stroke: { value: '#ffffff' },
+              strokeWidth: { value: 1.5 },
+            },
+          },
+        },
+        {
+          type: 'text' as const,
+          from: { data: 'points' },
+          encode: {
+            update: {
+              x: { scale: 'x', field: 'date' },
+              y: { scale: 'y', field: 'average', offset: -10 },
+              text: { field: 'average' },
+              align: { value: 'center' as const },
+              baseline: { value: 'bottom' as const },
+              fontSize: { value: 10 },
+              fill: { value: '#333333' },
+            },
+          },
+        },
+      ],
+    };
+
+    const view = new vega.View(vega.parse(spec), {
+      renderer: 'none',
+      logLevel: vega.Warn,
+    });
+    await view.runAsync();
+    const svgString = await view.toSVG();
+    await view.finalize();
+
+    return sharp(Buffer.from(svgString)).png().toBuffer();
+  }
+
   async renderMonthlyTirChart(
     monthlyTir: DailyTir[],
     title: string,

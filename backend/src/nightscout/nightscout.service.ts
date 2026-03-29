@@ -212,6 +212,44 @@ export class NightscoutService implements OnModuleInit {
     return data;
   }
 
+  /**
+   * Fetches all entries in a date range by splitting the window into chunks of
+   * `chunkDays` days and issuing one request per chunk. This avoids Nightscout
+   * 502s caused by requesting too many entries at once, and does not rely on the
+   * `skip` parameter which many Nightscout instances do not support.
+   *
+   * Requires `query.find.date.$gte` and `query.find.date.$lte` (epoch ms).
+   */
+  async getEntriesPaged(
+    query: NightscoutQueryParams = {},
+    chunkDays = 7,
+  ): Promise<NightscoutEntry[]> {
+    const find = (query.find ?? {}) as Record<string, Record<string, number>>;
+    const lowerDate: number = find['date']?.['$gte'] ?? 0;
+    const upperDate: number = find['date']?.['$lte'] ?? Date.now();
+
+    const chunkMs = chunkDays * 24 * 60 * 60 * 1000;
+    // 12 readings/hour × chunkDays + 20% buffer — enough for any CGM
+    const countPerChunk = Math.ceil(chunkDays * 24 * 12 * 1.2);
+
+    const results: NightscoutEntry[] = [];
+    let chunkEnd = upperDate;
+
+    while (chunkEnd > lowerDate) {
+      const chunkStart = Math.max(lowerDate, chunkEnd - chunkMs);
+      const page = await this.getEntries({
+        ...query,
+        find: { ...query.find, date: { $gte: chunkStart, $lte: chunkEnd } },
+        count: countPerChunk,
+      });
+      results.push(...page);
+      if (chunkStart <= lowerDate) break;
+      chunkEnd = chunkStart - 1;
+    }
+
+    return results;
+  }
+
   /** GET /api/v1/entries/:spec */
   async getEntriesBySpec(
     spec: string,

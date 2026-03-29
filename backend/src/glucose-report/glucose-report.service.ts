@@ -62,12 +62,8 @@ export class GlucoseReportService {
   ) {}
 
   async compute(from: Date, to: Date): Promise<GlucoseReportStats | null> {
-    const windowHours = (to.getTime() - from.getTime()) / 3_600_000;
-    const count = Math.max(288, Math.ceil(windowHours * 12 * 1.2));
-
-    const entries = await this.nightscout.getEntries({
+    const entries = await this.nightscout.getEntriesPaged({
       find: { date: { $gte: from.getTime(), $lte: to.getTime() } },
-      count,
     });
 
     const validEntries = entries.filter(
@@ -182,10 +178,8 @@ export class GlucoseReportService {
       0,
     );
 
-    const count = Math.ceil(months * 30 * 24 * 12 * 1.2);
-    const entries = await this.nightscout.getEntries({
+    const entries = await this.nightscout.getEntriesPaged({
       find: { date: { $gte: from.getTime(), $lte: to.getTime() } },
-      count,
     });
 
     const s = await this.adminSettings.getSettings('glucose-limits');
@@ -234,6 +228,52 @@ export class GlucoseReportService {
   }
 
   /**
+   * Fetches the last `months` calendar months and returns the average blood
+   * glucose per month (YYYY-MM keys).
+   */
+  async computeMonthlyAverageHistory(months: number): Promise<DailyAverage[]> {
+    const to = new Date();
+    const from = new Date(
+      to.getFullYear(),
+      to.getMonth() - months + 1,
+      1,
+      0,
+      0,
+      0,
+      0,
+    );
+
+    const entries = await this.nightscout.getEntriesPaged({
+      find: { date: { $gte: from.getTime(), $lte: to.getTime() } },
+    });
+
+    const s = await this.adminSettings.getSettings('glucose-limits');
+    const unit: string = s?.unit ?? 'mg/dL';
+    const factor = unit === 'mmol/L' ? 1 / MMOL_FACTOR : 1;
+    const precision = unit === 'mmol/L' ? 1 : 0;
+
+    const byMonth = new Map<string, number[]>();
+    for (const entry of entries) {
+      if (typeof entry.sgv !== 'number' || entry.sgv <= 0) continue;
+      const d = new Date(entry.date ?? Date.now());
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const value = +(entry.sgv * factor).toFixed(precision + 1);
+      const bucket = byMonth.get(key) ?? [];
+      bucket.push(value);
+      byMonth.set(key, bucket);
+    }
+
+    return Array.from(byMonth.entries())
+      .map(([date, vals]) => ({
+        date,
+        average: +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(
+          precision,
+        ),
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  /**
    * Fetches the last `days` nights (00:00–06:00 local) and returns the TIR
    * for each night based on the configured "In Range" limits.
    */
@@ -245,10 +285,8 @@ export class GlucoseReportService {
     from.setHours(0, 0, 0, 0);
 
     // Full 24 h × days to cover entire window — nightly filtering happens in memory
-    const count = Math.ceil(days * 24 * 12 * 1.2);
-    const entries = await this.nightscout.getEntries({
+    const entries = await this.nightscout.getEntriesPaged({
       find: { date: { $gte: from.getTime(), $lte: to.getTime() } },
-      count,
     });
 
     const s = await this.adminSettings.getSettings('glucose-limits');
