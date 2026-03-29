@@ -60,9 +60,15 @@ export class BatteryLevelJob extends JobTypeBase {
 
       if (history.length >= 2) {
         try {
-          const chartBuffer = await this.glucoseChart.renderBatteryDrainChart(history);
+          const chartBuffer = await this.glucoseChart.renderBatteryDrainChart(
+            history,
+            isCharging,
+          );
           notificationPayload.imageBuffers = [
-            { data: chartBuffer.toString('base64'), caption: 'Battery Level – Last 12 Hours' },
+            {
+              data: chartBuffer.toString('base64'),
+              caption: 'Battery Level – Last 12 Hours',
+            },
           ];
         } catch {
           // chart is best-effort; skip on failure
@@ -94,8 +100,10 @@ export class BatteryLevelJob extends JobTypeBase {
       `${batteryEmoji} Battery: ${level}%  ${bar(level)}`,
     ];
 
-    if (isCharging !== null) {
-      lines.push(isCharging ? '⚡ Charging' : '🔌 Not charging');
+    if (isCharging === true) {
+      lines.push('⚡ Charging — plugged in');
+    } else if (isCharging === false) {
+      lines.push('🔌 Not charging — running on battery');
     }
 
     // Calculate 12h drain from oldest to newest entry in history

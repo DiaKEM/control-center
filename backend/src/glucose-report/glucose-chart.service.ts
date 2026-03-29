@@ -590,6 +590,7 @@ export class GlucoseChartService {
 
   async renderBatteryDrainChart(
     history: Array<{ createdAt: Date; level: number }>,
+    isCharging: boolean | null = null,
     title = 'Battery Level – Last 12 Hours',
   ): Promise<Buffer> {
     // history is newest-first; reverse to chronological order for the chart
@@ -612,6 +613,9 @@ export class GlucoseChartService {
       { y0: Math.max(20, yMin),  y1: Math.min(50, yMax),  color: '#fff9c4' }, // low
       { y0: Math.max(50, yMin),  y1: Math.min(100, yMax), color: '#c8e6c9' }, // good
     ].filter((b) => b.y1 > b.y0);
+
+    // Line turns green while charging
+    const lineColor = isCharging === true ? '#2e7d32' : '#1565c0';
 
     const spec: vega.Spec = {
       $schema: 'https://vega.github.io/schema/vega/v5.json',
@@ -693,7 +697,7 @@ export class GlucoseChartService {
               x: { scale: 'x', field: 'time' },
               y: { scale: 'y', field: 'level' },
               y2: { scale: 'y', value: yMin },
-              fill: { value: '#1565c0' },
+              fill: { value: lineColor },
               fillOpacity: { value: 0.15 },
               interpolate: { value: 'monotone' },
             },
@@ -707,7 +711,7 @@ export class GlucoseChartService {
             update: {
               x: { scale: 'x', field: 'time' },
               y: { scale: 'y', field: 'level' },
-              stroke: { value: '#1565c0' },
+              stroke: { value: lineColor },
               strokeWidth: { value: 2.5 },
               interpolate: { value: 'monotone' },
             },
@@ -722,7 +726,7 @@ export class GlucoseChartService {
               x: { scale: 'x', field: 'time' },
               y: { scale: 'y', field: 'level' },
               size: { value: 60 },
-              fill: { value: '#1565c0' },
+              fill: { value: lineColor },
               stroke: { value: '#ffffff' },
               strokeWidth: { value: 1.5 },
             },
@@ -741,10 +745,30 @@ export class GlucoseChartService {
               baseline: { value: 'bottom' as const },
               fontSize: { value: 11 },
               fontWeight: { value: 'bold' as const },
-              fill: { value: '#1565c0' },
+              fill: { value: lineColor },
             },
           },
         },
+        // Charging status annotation (top-right, only when known)
+        ...(isCharging !== null
+          ? ([
+              {
+                type: 'text' as const,
+                encode: {
+                  update: {
+                    x: { signal: 'width' },
+                    y: { value: 4 },
+                    text: { value: isCharging ? 'Charging' : 'Not charging' },
+                    align: { value: 'right' as const },
+                    baseline: { value: 'top' as const },
+                    fontSize: { value: 11 },
+                    fontWeight: { value: 'bold' as const },
+                    fill: { value: isCharging ? '#2e7d32' : '#757575' },
+                  },
+                },
+              },
+            ] as vega.Mark[])
+          : []),
       ],
     };
 

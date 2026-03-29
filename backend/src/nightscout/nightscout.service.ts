@@ -798,7 +798,9 @@ export class NightscoutService implements OnModuleInit {
       charging?: boolean;
     } | undefined;
     const isCharging: boolean | null =
-      uploader?.isCharging ?? uploader?.charging ?? null;
+      uploader?.isCharging
+      ?? uploader?.charging
+      ?? (typeof latest['isCharging'] === 'boolean' ? (latest['isCharging'] as boolean) : null);
 
     const history = statuses
       .map((s) => {
