@@ -34,6 +34,15 @@ export interface GlucoseLimits {
 
 export type ServiceKey = 'nightscout' | 'pushover' | 'telegram'
 
+export interface NightscoutInfo {
+  version: string | null
+  latestGlucose: { sgv: number; direction: string | null; date: number | null } | null
+  battery: { level: number; isCharging: boolean | null } | null
+  sensor: { elapsedDays: number; changedAt: string | null } | null
+  pump: { elapsedDays: number; changedAt: string | null } | null
+  reservoirLevel: number | null
+}
+
 export const adminApi = createApi({
   reducerPath: 'adminApi',
   baseQuery: baseQueryWithAuth,
@@ -74,6 +83,9 @@ export const adminApi = createApi({
       query: (expression) => ({ url: '/admin/scheduler', method: 'PATCH', body: { expression } }),
       invalidatesTags: ['Scheduler'],
     }),
+    getNightscoutInfo: builder.query<NightscoutInfo, void>({
+      query: () => '/admin/nightscout-info',
+    }),
     getGlucoseLimits: builder.query<GlucoseLimits, void>({
       query: () => '/admin/glucose-limits',
       providesTags: ['GlucoseLimits'],
@@ -86,6 +98,7 @@ export const adminApi = createApi({
 })
 
 export const {
+  useGetNightscoutInfoQuery,
   useGetAdminConfigQuery,
   useUpdateNightscoutMutation,
   useUpdatePushoverMutation,

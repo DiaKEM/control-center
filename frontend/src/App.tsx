@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from '@/pages/LoginPage'
 import SetupPage from '@/pages/SetupPage'
+import DashboardPage from '@/pages/DashboardPage'
 import JobConfigurationPage from '@/pages/JobConfigurationPage'
 import JobExecutionPage from '@/pages/JobExecutionPage'
 import UserManagementPage from '@/pages/UserManagementPage'
@@ -27,7 +28,8 @@ function AppRouter() {
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          <Route index element={<Navigate to="/jobs/configuration" replace />} />
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/jobs/configuration" element={<JobConfigurationPage />} />
           <Route path="/jobs/execution" element={<JobExecutionPage />} />
           <Route path="/users" element={<UserManagementPage />} />

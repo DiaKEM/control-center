@@ -1,5 +1,5 @@
-import { useNavigate, useLocation } from 'react-router-dom'
-import { ChevronDown, LogOut, Settings, User, Users } from 'lucide-react'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
+import { BriefcaseBusiness, ChevronDown, LayoutDashboard, LogOut, Settings, User, Users } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { logout, selectUsername } from '@/features/auth/authSlice'
 import { Button } from '@/components/ui/button'
@@ -24,21 +24,35 @@ export default function Navbar() {
   const location = useLocation()
   const username = useAppSelector(selectUsername)
 
+  const dashboardActive = location.pathname === '/dashboard'
   const jobsActive = location.pathname.startsWith('/jobs')
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center gap-6 px-6">
         {/* Logo */}
-        <div className="flex items-center gap-2 select-none">
+        <Link to="/dashboard" className="flex items-center gap-2 select-none hover:opacity-80 transition-opacity">
           <img src="/images/navbar.png" alt="Diakem Notify" className="h-8 w-auto" />
           <span className="text-lg font-bold tracking-tight">
             <span style={{ color: '#2879C0' }}>Dia</span><span style={{ color: '#3D8B3D' }}>KEM</span>
           </span>
-        </div>
+        </Link>
 
         {/* Navigation links */}
         <nav className="flex items-center gap-1" aria-label="Main navigation">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className={cn(
+              'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+              dashboardActive
+                ? 'bg-secondary text-foreground'
+                : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+            )}
+          >
+            <LayoutDashboard className="h-3.5 w-3.5" aria-hidden />
+            Dashboard
+          </button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -49,6 +63,7 @@ export default function Navbar() {
                     : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
                 )}
               >
+                <BriefcaseBusiness className="h-3.5 w-3.5" aria-hidden />
                 Jobs
                 <ChevronDown className="h-3 w-3" aria-hidden />
               </button>

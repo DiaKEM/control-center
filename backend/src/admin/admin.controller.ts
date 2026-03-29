@@ -253,6 +253,45 @@ export class AdminController {
     return { deletedCount };
   }
 
+  @Get('nightscout-info')
+  @ApiOperation({ summary: 'Return live Nightscout instance details' })
+  @ApiOkResponse()
+  async getNightscoutInfo() {
+    const [version, latestGlucose, batteryInfo, sensorChange, pumpChange, reservoirLevel] =
+      await Promise.allSettled([
+        this.nightscout.getStatus(),
+        this.nightscout.getEntries({ count: 1 }),
+        this.nightscout.getLatestBatteryInfo(1),
+        this.nightscout.getLastSensorChange(),
+        this.nightscout.getLastPumpChange(),
+        this.nightscout.getLatestInsulinLevel(),
+      ]);
+
+    const entry = latestGlucose.status === 'fulfilled' ? latestGlucose.value?.[0] : null;
+    const battery = batteryInfo.status === 'fulfilled' ? batteryInfo.value : null;
+    const sensor = sensorChange.status === 'fulfilled' ? sensorChange.value : null;
+    const pump = pumpChange.status === 'fulfilled' ? pumpChange.value : null;
+    const reservoir = reservoirLevel.status === 'fulfilled' ? reservoirLevel.value : null;
+    const ns = version.status === 'fulfilled' ? version.value : null;
+
+    return {
+      version: ns?.version ?? null,
+      latestGlucose: entry?.sgv != null
+        ? { sgv: entry.sgv, direction: entry.direction ?? null, date: entry.date ?? null }
+        : null,
+      battery: battery
+        ? { level: battery.level, isCharging: battery.isCharging }
+        : null,
+      sensor: sensor
+        ? { elapsedDays: +sensor.elapsedDays.toFixed(1), changedAt: sensor.treatment.created_at ?? null }
+        : null,
+      pump: pump
+        ? { elapsedDays: +pump.elapsedDays.toFixed(1), changedAt: pump.treatment.created_at ?? null }
+        : null,
+      reservoirLevel: reservoir,
+    };
+  }
+
   @Get('glucose-limits')
   @ApiOperation({
     summary: 'Return the configured blood glucose limits and named ranges',
