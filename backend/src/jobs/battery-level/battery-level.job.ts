@@ -3,6 +3,7 @@ import { JobConfigurationService } from '../../job-configuration/job-configurati
 import { JobExecutionContext } from '../../job-execution/job-execution.context';
 import { JobExecutionService } from '../../job-execution/job-execution.service';
 import { NightscoutService } from '../../nightscout/nightscout.service';
+import { GlucoseChartService } from '../../glucose-report/glucose-chart.service';
 import { JobType } from '../../job-type/job-type.decorator';
 import { JobTypeBase } from '../../job-type/job-type-base';
 
@@ -15,6 +16,7 @@ export class BatteryLevelJob extends JobTypeBase {
     private readonly nightscout: NightscoutService,
     private readonly jobConfigService: JobConfigurationService,
     private readonly jobExecutionService: JobExecutionService,
+    private readonly glucoseChart: GlucoseChartService,
   ) {
     super();
   }
@@ -50,11 +52,24 @@ export class BatteryLevelJob extends JobTypeBase {
         `Battery level ${level}% is at or below threshold ${config.threshold}% — notification required`,
       );
 
-      await ctx.needsNotification({
+      const notificationPayload: Parameters<typeof ctx.needsNotification>[0] = {
         title: 'Low Battery',
         message: this.buildMessage(level, isCharging, history),
         priority: config.priority,
-      });
+      };
+
+      if (history.length >= 2) {
+        try {
+          const chartBuffer = await this.glucoseChart.renderBatteryDrainChart(history);
+          notificationPayload.imageBuffers = [
+            { data: chartBuffer.toString('base64'), caption: 'Battery Level – Last 12 Hours' },
+          ];
+        } catch {
+          // chart is best-effort; skip on failure
+        }
+      }
+
+      await ctx.needsNotification(notificationPayload);
       await ctx.complete();
     } catch (err: unknown) {
       await ctx.error(err?.toString() || 'Unknown error');

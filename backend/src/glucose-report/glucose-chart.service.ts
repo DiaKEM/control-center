@@ -588,6 +588,177 @@ export class GlucoseChartService {
     return sharp(Buffer.from(svgString)).png().toBuffer();
   }
 
+  async renderBatteryDrainChart(
+    history: Array<{ createdAt: Date; level: number }>,
+    title = 'Battery Level – Last 12 Hours',
+  ): Promise<Buffer> {
+    // history is newest-first; reverse to chronological order for the chart
+    const sorted = [...history].reverse();
+
+    const chartData = sorted.map((p) => ({
+      time: p.createdAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      level: p.level,
+    }));
+
+    // Pre-compute endpoints in TS (avoids Vega expression issues with object references)
+    const endpoints = [chartData[0], chartData[chartData.length - 1]];
+
+    const levels = chartData.map((d) => d.level);
+    const yMin = Math.max(0, Math.floor(Math.min(...levels)) - 5);
+    const yMax = Math.min(100, Math.ceil(Math.max(...levels)) + 5);
+
+    const bands = [
+      { y0: Math.max(0, yMin),   y1: Math.min(20, yMax),  color: '#ffcdd2' }, // critical
+      { y0: Math.max(20, yMin),  y1: Math.min(50, yMax),  color: '#fff9c4' }, // low
+      { y0: Math.max(50, yMin),  y1: Math.min(100, yMax), color: '#c8e6c9' }, // good
+    ].filter((b) => b.y1 > b.y0);
+
+    const spec: vega.Spec = {
+      $schema: 'https://vega.github.io/schema/vega/v5.json',
+      width: 520,
+      height: 260,
+      padding: { top: 10, left: 50, right: 20, bottom: 55 },
+      background: '#ffffff',
+      title: {
+        text: title,
+        fontSize: 14,
+        fontWeight: 'bold' as const,
+        color: '#333333',
+        anchor: 'middle' as const,
+        offset: 8,
+      },
+      data: [
+        { name: 'bands', values: bands },
+        { name: 'points', values: chartData },
+        { name: 'endpoints', values: endpoints },
+      ],
+      scales: [
+        {
+          name: 'x',
+          type: 'point' as const,
+          domain: { data: 'points', field: 'time' },
+          range: 'width' as const,
+          padding: 0.1,
+        },
+        {
+          name: 'y',
+          type: 'linear' as const,
+          domain: [yMin, yMax],
+          range: 'height' as const,
+          nice: true,
+          zero: false,
+        },
+      ],
+      axes: [
+        {
+          orient: 'bottom' as const,
+          scale: 'x',
+          labelAngle: -45,
+          labelAlign: 'right' as const,
+          labelFontSize: 10,
+          labelOverlap: true,
+        },
+        {
+          orient: 'left' as const,
+          scale: 'y',
+          labelFontSize: 11,
+          title: 'Battery (%)',
+          titleFontSize: 12,
+          tickCount: 6,
+          format: 'd',
+        },
+      ],
+      marks: [
+        // Color bands
+        {
+          type: 'rect' as const,
+          from: { data: 'bands' },
+          encode: {
+            update: {
+              x: { value: 0 },
+              x2: { signal: 'width' },
+              y: { scale: 'y', field: 'y1' },
+              y2: { scale: 'y', field: 'y0' },
+              fill: { field: 'color' },
+              opacity: { value: 0.6 },
+            },
+          },
+        },
+        // Area fill under line
+        {
+          type: 'area' as const,
+          from: { data: 'points' },
+          encode: {
+            update: {
+              x: { scale: 'x', field: 'time' },
+              y: { scale: 'y', field: 'level' },
+              y2: { scale: 'y', value: yMin },
+              fill: { value: '#1565c0' },
+              fillOpacity: { value: 0.15 },
+              interpolate: { value: 'monotone' },
+            },
+          },
+        },
+        // Line
+        {
+          type: 'line' as const,
+          from: { data: 'points' },
+          encode: {
+            update: {
+              x: { scale: 'x', field: 'time' },
+              y: { scale: 'y', field: 'level' },
+              stroke: { value: '#1565c0' },
+              strokeWidth: { value: 2.5 },
+              interpolate: { value: 'monotone' },
+            },
+          },
+        },
+        // Start and end point markers
+        {
+          type: 'symbol' as const,
+          from: { data: 'endpoints' },
+          encode: {
+            update: {
+              x: { scale: 'x', field: 'time' },
+              y: { scale: 'y', field: 'level' },
+              size: { value: 60 },
+              fill: { value: '#1565c0' },
+              stroke: { value: '#ffffff' },
+              strokeWidth: { value: 1.5 },
+            },
+          },
+        },
+        // Labels for start and end
+        {
+          type: 'text' as const,
+          from: { data: 'endpoints' },
+          encode: {
+            update: {
+              x: { scale: 'x', field: 'time' },
+              y: { scale: 'y', field: 'level', offset: -10 },
+              text: { signal: "datum.level + '%'" },
+              align: { value: 'center' as const },
+              baseline: { value: 'bottom' as const },
+              fontSize: { value: 11 },
+              fontWeight: { value: 'bold' as const },
+              fill: { value: '#1565c0' },
+            },
+          },
+        },
+      ],
+    };
+
+    const view = new vega.View(vega.parse(spec), {
+      renderer: 'none',
+      logLevel: vega.Warn,
+    });
+    await view.runAsync();
+    const svgString = await view.toSVG();
+    await view.finalize();
+
+    return sharp(Buffer.from(svgString)).png().toBuffer();
+  }
+
   async renderMonthlyTirChart(
     monthlyTir: DailyTir[],
     title: string,
