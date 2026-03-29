@@ -13,7 +13,7 @@
     "dotenv-cli": "^11.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "prettier": "^3.8.1",
+    "oxfmt": "latest",
     "release-it": "^19.2.4"
   },
   "dependencies": {
@@ -21,12 +21,12 @@
   },
   "lint-staged": {
     "backend/{src,test}/**/*.ts": [
-      "prettier --write",
-      "backend/node_modules/.bin/eslint --fix --config backend/eslint.config.mjs"
+      "oxfmt --write",
+      "backend/node_modules/.bin/oxlint --fix"
     ],
     "frontend/src/**/*.{ts,tsx}": [
-      "prettier --write",
-      "frontend/node_modules/.bin/eslint --fix --config frontend/eslint.config.js"
+      "oxfmt --write",
+      "frontend/node_modules/.bin/oxlint --fix"
     ]
   }
 }

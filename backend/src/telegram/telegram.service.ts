@@ -148,12 +148,8 @@ export class TelegramService implements OnModuleInit {
   async reinitialize(): Promise<void> {
     const settings = await this.adminSettings.getSettings('telegram');
     console.log(settings);
-    const token =
-      settings?.botToken ||
-      this.configService.get<string>('TELEGRAM_BOT_TOKEN', '');
-    this.chatId =
-      settings?.chatId ||
-      this.configService.get<string>('TELEGRAM_CHAT_ID', '');
+    const token = settings?.botToken || this.configService.get<string>('TELEGRAM_BOT_TOKEN', '');
+    this.chatId = settings?.chatId || this.configService.get<string>('TELEGRAM_CHAT_ID', '');
 
     if (!token) {
       this.logger.warn('Telegram not configured — skipping client init');
@@ -167,14 +163,8 @@ export class TelegramService implements OnModuleInit {
     this.logger.log('Telegram client initialized');
   }
 
-  private async call<T>(
-    method: string,
-    params: Record<string, unknown> = {},
-  ): Promise<T> {
-    const { data } = await this.client.post<TelegramApiResponse<T>>(
-      `/${method}`,
-      params,
-    );
+  private async call<T>(method: string, params: Record<string, unknown> = {}): Promise<T> {
+    const { data } = await this.client.post<TelegramApiResponse<T>>(`/${method}`, params);
     return data.result;
   }
 
@@ -217,9 +207,7 @@ export class TelegramService implements OnModuleInit {
       protect_content: options.protect_content,
       reply_to_message_id: options.reply_to_message_id,
       reply_markup: options.reply_markup,
-      link_preview_options: options.link_preview_disabled
-        ? { is_disabled: true }
-        : undefined,
+      link_preview_options: options.link_preview_disabled ? { is_disabled: true } : undefined,
     });
   }
 
@@ -240,19 +228,14 @@ export class TelegramService implements OnModuleInit {
       text,
       parse_mode: options.parse_mode,
       reply_markup: options.reply_markup,
-      link_preview_options: options.link_preview_disabled
-        ? { is_disabled: true }
-        : undefined,
+      link_preview_options: options.link_preview_disabled ? { is_disabled: true } : undefined,
     });
   }
 
   /**
    * Delete a message.
    */
-  async deleteMessage(
-    messageId: number,
-    chatId?: string | number,
-  ): Promise<boolean> {
+  async deleteMessage(messageId: number, chatId?: string | number): Promise<boolean> {
     return this.call<boolean>('deleteMessage', {
       chat_id: chatId ?? this.chatId,
       message_id: messageId,
@@ -307,10 +290,7 @@ export class TelegramService implements OnModuleInit {
   /**
    * Send a photo by URL or file_id.
    */
-  async sendPhoto(
-    photo: string,
-    options: TelegramSendPhotoOptions = {},
-  ): Promise<TelegramMessage> {
+  async sendPhoto(photo: string, options: TelegramSendPhotoOptions = {}): Promise<TelegramMessage> {
     return this.call<TelegramMessage>('sendPhoto', {
       chat_id: options.chat_id ?? this.chatId,
       photo,
@@ -331,7 +311,7 @@ export class TelegramService implements OnModuleInit {
     buffer: Buffer,
     options: TelegramSendPhotoOptions & { filename?: string } = {},
   ): Promise<TelegramMessage> {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // oxlint-disable-next-line typescript/no-require-imports
     const FormData = require('form-data') as typeof import('form-data');
     const form = new FormData();
     form.append('chat_id', String(options.chat_id ?? this.chatId));
@@ -344,9 +324,11 @@ export class TelegramService implements OnModuleInit {
     if (options.disable_notification != null)
       form.append('disable_notification', String(options.disable_notification));
 
-    const { data } = await this.client.post<
-      TelegramApiResponse<TelegramMessage>
-    >('/sendPhoto', form, { headers: form.getHeaders() });
+    const { data } = await this.client.post<TelegramApiResponse<TelegramMessage>>(
+      '/sendPhoto',
+      form,
+      { headers: form.getHeaders() },
+    );
     return data.result;
   }
 
@@ -362,7 +344,7 @@ export class TelegramService implements OnModuleInit {
       reply_to_message_id?: number;
     } = {},
   ): Promise<TelegramMessage[]> {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // oxlint-disable-next-line typescript/no-require-imports
     const FormData = require('form-data') as typeof import('form-data');
     const form = new FormData();
     form.append('chat_id', String(options.chat_id ?? this.chatId));
@@ -385,9 +367,11 @@ export class TelegramService implements OnModuleInit {
     });
     form.append('media', JSON.stringify(mediaJson));
 
-    const { data } = await this.client.post<
-      TelegramApiResponse<TelegramMessage[]>
-    >('/sendMediaGroup', form, { headers: form.getHeaders() });
+    const { data } = await this.client.post<TelegramApiResponse<TelegramMessage[]>>(
+      '/sendMediaGroup',
+      form,
+      { headers: form.getHeaders() },
+    );
     return data.result;
   }
 
@@ -602,10 +586,7 @@ export class TelegramService implements OnModuleInit {
   /**
    * Unpin a message in a chat.
    */
-  async unpinMessage(
-    messageId: number,
-    chatId?: string | number,
-  ): Promise<boolean> {
+  async unpinMessage(messageId: number, chatId?: string | number): Promise<boolean> {
     return this.call<boolean>('unpinChatMessage', {
       chat_id: chatId ?? this.chatId,
       message_id: messageId,
@@ -642,10 +623,7 @@ export class TelegramService implements OnModuleInit {
   /**
    * Get info about a specific member of a chat.
    */
-  async getChatMember(
-    userId: number,
-    chatId?: string | number,
-  ): Promise<TelegramChatMember> {
+  async getChatMember(userId: number, chatId?: string | number): Promise<TelegramChatMember> {
     return this.call<TelegramChatMember>('getChatMember', {
       chat_id: chatId ?? this.chatId,
       user_id: userId,

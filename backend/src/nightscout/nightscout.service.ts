@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createHash } from 'crypto';
 
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
@@ -110,12 +109,11 @@ export class NightscoutService implements OnModuleInit {
 
   async reinitialize(): Promise<void> {
     const settings = await this.adminSettings.getSettings('nightscout');
-    const baseURL = (
-      settings?.url || this.configService.get<string>('NIGHTSCOUT_URL', '')
-    ).replace(/\/$/, '');
-    const apiKey =
-      settings?.apiKey ||
-      this.configService.get<string>('NIGHTSCOUT_API_KEY', '');
+    const baseURL = (settings?.url || this.configService.get<string>('NIGHTSCOUT_URL', '')).replace(
+      /\/$/,
+      '',
+    );
+    const apiKey = settings?.apiKey || this.configService.get<string>('NIGHTSCOUT_API_KEY', '');
 
     if (!baseURL || !apiKey) {
       this.logger.warn('Nightscout not configured — skipping client init');
@@ -133,9 +131,7 @@ export class NightscoutService implements OnModuleInit {
     this.logger.log('Nightscout client initialized');
   }
 
-  private buildParams(
-    query: NightscoutQueryParams = {},
-  ): Record<string, unknown> {
+  private buildParams(query: NightscoutQueryParams = {}): Record<string, unknown> {
     const params: Record<string, unknown> = {};
 
     if (query.count !== undefined) params['count'] = query.count;
@@ -174,11 +170,7 @@ export class NightscoutService implements OnModuleInit {
   ): void {
     for (const [key, value] of Object.entries(obj)) {
       const flatKey = `${prefix}[${key}]`;
-      if (
-        value !== null &&
-        typeof value === 'object' &&
-        !Array.isArray(value)
-      ) {
+      if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
         this.flattenObject(value as Record<string, unknown>, flatKey, result);
       } else {
         result[flatKey] = value;
@@ -205,15 +197,10 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** GET /api/v1/entries */
-  async getEntries(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutEntry[]> {
-    const { data } = await this.client.get<NightscoutEntry[]>(
-      '/api/v1/entries',
-      {
-        params: this.buildParams(query),
-      },
-    );
+  async getEntries(query: NightscoutQueryParams = {}): Promise<NightscoutEntry[]> {
+    const { data } = await this.client.get<NightscoutEntry[]>('/api/v1/entries', {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
@@ -260,37 +247,26 @@ export class NightscoutService implements OnModuleInit {
     spec: string,
     query: NightscoutQueryParams = {},
   ): Promise<NightscoutEntry[]> {
-    const { data } = await this.client.get<NightscoutEntry[]>(
-      `/api/v1/entries/${spec}`,
-      {
-        params: this.buildParams(query),
-      },
-    );
+    const { data } = await this.client.get<NightscoutEntry[]>(`/api/v1/entries/${spec}`, {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
   /** GET /api/v1/entries/current */
   async getCurrentEntry(): Promise<NightscoutEntry[]> {
-    const { data } = await this.client.get<NightscoutEntry[]>(
-      '/api/v1/entries/current',
-    );
+    const { data } = await this.client.get<NightscoutEntry[]>('/api/v1/entries/current');
     return data;
   }
 
   /** POST /api/v1/entries */
   async createEntries(entries: NightscoutEntry[]): Promise<NightscoutEntry[]> {
-    const { data } = await this.client.post<NightscoutEntry[]>(
-      '/api/v1/entries',
-      entries,
-    );
+    const { data } = await this.client.post<NightscoutEntry[]>('/api/v1/entries', entries);
     return data;
   }
 
   /** DELETE /api/v1/entries/:spec */
-  async deleteEntries(
-    spec: string,
-    query: NightscoutQueryParams = {},
-  ): Promise<unknown> {
+  async deleteEntries(spec: string, query: NightscoutQueryParams = {}): Promise<unknown> {
     const { data } = await this.client.delete(`/api/v1/entries/${spec}`, {
       params: this.buildParams(query),
     });
@@ -298,22 +274,15 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** GET /api/v1/treatments */
-  async getTreatments(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutTreatment[]> {
-    const { data } = await this.client.get<NightscoutTreatment[]>(
-      '/api/v1/treatments',
-      {
-        params: this.buildParams(query),
-      },
-    );
+  async getTreatments(query: NightscoutQueryParams = {}): Promise<NightscoutTreatment[]> {
+    const { data } = await this.client.get<NightscoutTreatment[]>('/api/v1/treatments', {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
   /** POST /api/v1/treatments */
-  async createTreatments(
-    treatments: NightscoutTreatment[],
-  ): Promise<NightscoutTreatment[]> {
+  async createTreatments(treatments: NightscoutTreatment[]): Promise<NightscoutTreatment[]> {
     const { data } = await this.client.post<NightscoutTreatment[]>(
       '/api/v1/treatments',
       treatments,
@@ -322,13 +291,8 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** PUT /api/v1/treatments */
-  async updateTreatment(
-    treatment: NightscoutTreatment,
-  ): Promise<NightscoutTreatment> {
-    const { data } = await this.client.put<NightscoutTreatment>(
-      '/api/v1/treatments',
-      treatment,
-    );
+  async updateTreatment(treatment: NightscoutTreatment): Promise<NightscoutTreatment> {
+    const { data } = await this.client.put<NightscoutTreatment>('/api/v1/treatments', treatment);
     return data;
   }
 
@@ -339,42 +303,29 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** GET /api/v1/profile */
-  async getProfiles(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutProfile[]> {
-    const { data } = await this.client.get<NightscoutProfile[]>(
-      '/api/v1/profile',
-      {
-        params: this.buildParams(query),
-      },
-    );
+  async getProfiles(query: NightscoutQueryParams = {}): Promise<NightscoutProfile[]> {
+    const { data } = await this.client.get<NightscoutProfile[]>('/api/v1/profile', {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
   /** POST /api/v1/profile */
   async createProfile(profile: NightscoutProfile): Promise<NightscoutProfile> {
-    const { data } = await this.client.post<NightscoutProfile>(
-      '/api/v1/profile',
-      profile,
-    );
+    const { data } = await this.client.post<NightscoutProfile>('/api/v1/profile', profile);
     return data;
   }
 
   /** GET /api/v1/devicestatus */
-  async getDeviceStatuses(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutDeviceStatus[]> {
-    const { data } = await this.client.get<NightscoutDeviceStatus[]>(
-      '/api/v1/devicestatus',
-      { params: this.buildParams(query) },
-    );
+  async getDeviceStatuses(query: NightscoutQueryParams = {}): Promise<NightscoutDeviceStatus[]> {
+    const { data } = await this.client.get<NightscoutDeviceStatus[]>('/api/v1/devicestatus', {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
   /** POST /api/v1/devicestatus */
-  async createDeviceStatus(
-    deviceStatus: NightscoutDeviceStatus,
-  ): Promise<NightscoutDeviceStatus> {
+  async createDeviceStatus(deviceStatus: NightscoutDeviceStatus): Promise<NightscoutDeviceStatus> {
     const { data } = await this.client.post<NightscoutDeviceStatus>(
       '/api/v1/devicestatus',
       deviceStatus,
@@ -398,19 +349,13 @@ export class NightscoutService implements OnModuleInit {
 
   /** POST /api/v1/food */
   async createFood(food: NightscoutFood[]): Promise<NightscoutFood[]> {
-    const { data } = await this.client.post<NightscoutFood[]>(
-      '/api/v1/food',
-      food,
-    );
+    const { data } = await this.client.post<NightscoutFood[]>('/api/v1/food', food);
     return data;
   }
 
   /** PUT /api/v1/food/:id */
   async updateFood(id: string, food: NightscoutFood): Promise<NightscoutFood> {
-    const { data } = await this.client.put<NightscoutFood>(
-      `/api/v1/food/${id}`,
-      food,
-    );
+    const { data } = await this.client.put<NightscoutFood>(`/api/v1/food/${id}`, food);
     return data;
   }
 
@@ -421,15 +366,10 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** GET /api/v1/activity */
-  async getActivity(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutActivity[]> {
-    const { data } = await this.client.get<NightscoutActivity[]>(
-      '/api/v1/activity',
-      {
-        params: this.buildParams(query),
-      },
-    );
+  async getActivity(query: NightscoutQueryParams = {}): Promise<NightscoutActivity[]> {
+    const { data } = await this.client.get<NightscoutActivity[]>('/api/v1/activity', {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
@@ -448,56 +388,34 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** GET /api/v3/entries */
-  async getV3Entries(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutEntry[]> {
-    const { data } = await this.client.get<NightscoutEntry[]>(
-      '/api/v3/entries',
-      {
-        params: this.buildParams(query),
-      },
-    );
+  async getV3Entries(query: NightscoutQueryParams = {}): Promise<NightscoutEntry[]> {
+    const { data } = await this.client.get<NightscoutEntry[]>('/api/v3/entries', {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
   /** GET /api/v3/entries/:id */
   async getV3EntryById(id: string): Promise<NightscoutEntry> {
-    const { data } = await this.client.get<NightscoutEntry>(
-      `/api/v3/entries/${id}`,
-    );
+    const { data } = await this.client.get<NightscoutEntry>(`/api/v3/entries/${id}`);
     return data;
   }
 
   /** POST /api/v3/entries */
   async createV3Entry(entry: NightscoutEntry): Promise<NightscoutEntry> {
-    const { data } = await this.client.post<NightscoutEntry>(
-      '/api/v3/entries',
-      entry,
-    );
+    const { data } = await this.client.post<NightscoutEntry>('/api/v3/entries', entry);
     return data;
   }
 
   /** PUT /api/v3/entries/:id */
-  async updateV3Entry(
-    id: string,
-    entry: NightscoutEntry,
-  ): Promise<NightscoutEntry> {
-    const { data } = await this.client.put<NightscoutEntry>(
-      `/api/v3/entries/${id}`,
-      entry,
-    );
+  async updateV3Entry(id: string, entry: NightscoutEntry): Promise<NightscoutEntry> {
+    const { data } = await this.client.put<NightscoutEntry>(`/api/v3/entries/${id}`, entry);
     return data;
   }
 
   /** PATCH /api/v3/entries/:id */
-  async patchV3Entry(
-    id: string,
-    entry: Partial<NightscoutEntry>,
-  ): Promise<NightscoutEntry> {
-    const { data } = await this.client.patch<NightscoutEntry>(
-      `/api/v3/entries/${id}`,
-      entry,
-    );
+  async patchV3Entry(id: string, entry: Partial<NightscoutEntry>): Promise<NightscoutEntry> {
+    const { data } = await this.client.patch<NightscoutEntry>(`/api/v3/entries/${id}`, entry);
     return data;
   }
 
@@ -508,34 +426,22 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** GET /api/v3/treatments */
-  async getV3Treatments(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutTreatment[]> {
-    const { data } = await this.client.get<NightscoutTreatment[]>(
-      '/api/v3/treatments',
-      {
-        params: this.buildParams(query),
-      },
-    );
+  async getV3Treatments(query: NightscoutQueryParams = {}): Promise<NightscoutTreatment[]> {
+    const { data } = await this.client.get<NightscoutTreatment[]>('/api/v3/treatments', {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
   /** GET /api/v3/treatments/:id */
   async getV3TreatmentById(id: string): Promise<NightscoutTreatment> {
-    const { data } = await this.client.get<NightscoutTreatment>(
-      `/api/v3/treatments/${id}`,
-    );
+    const { data } = await this.client.get<NightscoutTreatment>(`/api/v3/treatments/${id}`);
     return data;
   }
 
   /** POST /api/v3/treatments */
-  async createV3Treatment(
-    treatment: NightscoutTreatment,
-  ): Promise<NightscoutTreatment> {
-    const { data } = await this.client.post<NightscoutTreatment>(
-      '/api/v3/treatments',
-      treatment,
-    );
+  async createV3Treatment(treatment: NightscoutTreatment): Promise<NightscoutTreatment> {
+    const { data } = await this.client.post<NightscoutTreatment>('/api/v3/treatments', treatment);
     return data;
   }
 
@@ -570,21 +476,16 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** GET /api/v3/devicestatus */
-  async getV3DeviceStatuses(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutDeviceStatus[]> {
-    const { data } = await this.client.get<NightscoutDeviceStatus[]>(
-      '/api/v3/devicestatus',
-      { params: this.buildParams(query) },
-    );
+  async getV3DeviceStatuses(query: NightscoutQueryParams = {}): Promise<NightscoutDeviceStatus[]> {
+    const { data } = await this.client.get<NightscoutDeviceStatus[]>('/api/v3/devicestatus', {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
   /** GET /api/v3/devicestatus/:id */
   async getV3DeviceStatusById(id: string): Promise<NightscoutDeviceStatus> {
-    const { data } = await this.client.get<NightscoutDeviceStatus>(
-      `/api/v3/devicestatus/${id}`,
-    );
+    const { data } = await this.client.get<NightscoutDeviceStatus>(`/api/v3/devicestatus/${id}`);
     return data;
   }
 
@@ -606,46 +507,28 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** GET /api/v3/profile */
-  async getV3Profiles(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutProfile[]> {
-    const { data } = await this.client.get<NightscoutProfile[]>(
-      '/api/v3/profile',
-      {
-        params: this.buildParams(query),
-      },
-    );
+  async getV3Profiles(query: NightscoutQueryParams = {}): Promise<NightscoutProfile[]> {
+    const { data } = await this.client.get<NightscoutProfile[]>('/api/v3/profile', {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
   /** GET /api/v3/profile/:id */
   async getV3ProfileById(id: string): Promise<NightscoutProfile> {
-    const { data } = await this.client.get<NightscoutProfile>(
-      `/api/v3/profile/${id}`,
-    );
+    const { data } = await this.client.get<NightscoutProfile>(`/api/v3/profile/${id}`);
     return data;
   }
 
   /** POST /api/v3/profile */
-  async createV3Profile(
-    profile: NightscoutProfile,
-  ): Promise<NightscoutProfile> {
-    const { data } = await this.client.post<NightscoutProfile>(
-      '/api/v3/profile',
-      profile,
-    );
+  async createV3Profile(profile: NightscoutProfile): Promise<NightscoutProfile> {
+    const { data } = await this.client.post<NightscoutProfile>('/api/v3/profile', profile);
     return data;
   }
 
   /** PUT /api/v3/profile/:id */
-  async updateV3Profile(
-    id: string,
-    profile: NightscoutProfile,
-  ): Promise<NightscoutProfile> {
-    const { data } = await this.client.put<NightscoutProfile>(
-      `/api/v3/profile/${id}`,
-      profile,
-    );
+  async updateV3Profile(id: string, profile: NightscoutProfile): Promise<NightscoutProfile> {
+    const { data } = await this.client.put<NightscoutProfile>(`/api/v3/profile/${id}`, profile);
     return data;
   }
 
@@ -656,9 +539,7 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** GET /api/v3/food */
-  async getV3Food(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutFood[]> {
+  async getV3Food(query: NightscoutQueryParams = {}): Promise<NightscoutFood[]> {
     const { data } = await this.client.get<NightscoutFood[]>('/api/v3/food', {
       params: this.buildParams(query),
     });
@@ -667,30 +548,19 @@ export class NightscoutService implements OnModuleInit {
 
   /** GET /api/v3/food/:id */
   async getV3FoodById(id: string): Promise<NightscoutFood> {
-    const { data } = await this.client.get<NightscoutFood>(
-      `/api/v3/food/${id}`,
-    );
+    const { data } = await this.client.get<NightscoutFood>(`/api/v3/food/${id}`);
     return data;
   }
 
   /** POST /api/v3/food */
   async createV3Food(food: NightscoutFood): Promise<NightscoutFood> {
-    const { data } = await this.client.post<NightscoutFood>(
-      '/api/v3/food',
-      food,
-    );
+    const { data } = await this.client.post<NightscoutFood>('/api/v3/food', food);
     return data;
   }
 
   /** PUT /api/v3/food/:id */
-  async updateV3Food(
-    id: string,
-    food: NightscoutFood,
-  ): Promise<NightscoutFood> {
-    const { data } = await this.client.put<NightscoutFood>(
-      `/api/v3/food/${id}`,
-      food,
-    );
+  async updateV3Food(id: string, food: NightscoutFood): Promise<NightscoutFood> {
+    const { data } = await this.client.put<NightscoutFood>(`/api/v3/food/${id}`, food);
     return data;
   }
 
@@ -701,46 +571,28 @@ export class NightscoutService implements OnModuleInit {
   }
 
   /** GET /api/v3/activity */
-  async getV3Activity(
-    query: NightscoutQueryParams = {},
-  ): Promise<NightscoutActivity[]> {
-    const { data } = await this.client.get<NightscoutActivity[]>(
-      '/api/v3/activity',
-      {
-        params: this.buildParams(query),
-      },
-    );
+  async getV3Activity(query: NightscoutQueryParams = {}): Promise<NightscoutActivity[]> {
+    const { data } = await this.client.get<NightscoutActivity[]>('/api/v3/activity', {
+      params: this.buildParams(query),
+    });
     return data;
   }
 
   /** GET /api/v3/activity/:id */
   async getV3ActivityById(id: string): Promise<NightscoutActivity> {
-    const { data } = await this.client.get<NightscoutActivity>(
-      `/api/v3/activity/${id}`,
-    );
+    const { data } = await this.client.get<NightscoutActivity>(`/api/v3/activity/${id}`);
     return data;
   }
 
   /** POST /api/v3/activity */
-  async createV3Activity(
-    activity: NightscoutActivity,
-  ): Promise<NightscoutActivity> {
-    const { data } = await this.client.post<NightscoutActivity>(
-      '/api/v3/activity',
-      activity,
-    );
+  async createV3Activity(activity: NightscoutActivity): Promise<NightscoutActivity> {
+    const { data } = await this.client.post<NightscoutActivity>('/api/v3/activity', activity);
     return data;
   }
 
   /** PUT /api/v3/activity/:id */
-  async updateV3Activity(
-    id: string,
-    activity: NightscoutActivity,
-  ): Promise<NightscoutActivity> {
-    const { data } = await this.client.put<NightscoutActivity>(
-      `/api/v3/activity/${id}`,
-      activity,
-    );
+  async updateV3Activity(id: string, activity: NightscoutActivity): Promise<NightscoutActivity> {
+    const { data } = await this.client.put<NightscoutActivity>(`/api/v3/activity/${id}`, activity);
     return data;
   }
 
@@ -830,9 +682,7 @@ export class NightscoutService implements OnModuleInit {
     const status = statuses[0];
     if (!status) return false;
 
-    const pump = status['pump'] as
-      | { status?: { suspended?: boolean } }
-      | undefined;
+    const pump = status['pump'] as { status?: { suspended?: boolean } } | undefined;
 
     return pump?.status?.suspended === true;
   }
@@ -868,8 +718,7 @@ export class NightscoutService implements OnModuleInit {
     const changedAt = new Date(treatment.created_at);
     if (isNaN(changedAt.getTime())) return null;
 
-    const elapsedDays =
-      (Date.now() - changedAt.getTime()) / (1000 * 60 * 60 * 24);
+    const elapsedDays = (Date.now() - changedAt.getTime()) / (1000 * 60 * 60 * 24);
     return { treatment, elapsedDays };
   }
 
@@ -888,8 +737,7 @@ export class NightscoutService implements OnModuleInit {
     const changedAt = new Date(treatment.created_at);
     if (isNaN(changedAt.getTime())) return null;
 
-    const elapsedDays =
-      (Date.now() - changedAt.getTime()) / (1000 * 60 * 60 * 24);
+    const elapsedDays = (Date.now() - changedAt.getTime()) / (1000 * 60 * 60 * 24);
     return { treatment, elapsedDays };
   }
 }

@@ -20,12 +20,7 @@ export class NightlyReportJob extends ReportJobBase {
     jobConfigService: JobConfigurationService,
     private readonly glucoseChart: GlucoseChartService,
   ) {
-    super(
-      NIGHTLY_REPORT_JOB_KEY,
-      jobExecutionService,
-      glucoseReport,
-      jobConfigService,
-    );
+    super(NIGHTLY_REPORT_JOB_KEY, jobExecutionService, glucoseReport, jobConfigService);
   }
 
   protected get reportTitle(): string {
@@ -35,26 +30,18 @@ export class NightlyReportJob extends ReportJobBase {
     return 'Nightly (00:00–06:00)';
   }
 
-  protected async getImageBuffer(
-    stats: GlucoseReportStats,
-  ): Promise<Buffer | undefined> {
+  protected async getImageBuffer(stats: GlucoseReportStats): Promise<Buffer | undefined> {
     return this.glucoseChart.renderDonut(stats, this.reportTitle);
   }
 
   protected async getAdditionalImages(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _stats: GlucoseReportStats,
   ): Promise<Array<{ buffer: Buffer; caption: string }>> {
-    const dailyTir: DailyTir[] =
-      await this.glucoseReport.computeNightlyTirHistory(14);
+    const dailyTir: DailyTir[] = await this.glucoseReport.computeNightlyTirHistory(14);
     if (!dailyTir.length) return [];
 
     const caption = 'Nightly TIR – Last 14 Days (00:00–06:00)';
-    const buffer = await this.glucoseChart.renderTirLineChart(
-      dailyTir,
-      'In Range',
-      caption,
-    );
+    const buffer = await this.glucoseChart.renderTirLineChart(dailyTir, 'In Range', caption);
     return [{ buffer, caption }];
   }
 

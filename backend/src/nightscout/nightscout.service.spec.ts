@@ -58,7 +58,6 @@ describe('NightscoutService', () => {
 
   describe('constructor', () => {
     it('strips trailing slash from base URL', () => {
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(axios.create).toHaveBeenCalledWith(
         expect.objectContaining({ baseURL: 'http://nightscout.test' }),
       );
@@ -119,10 +118,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v1/entries/:spec', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getEntriesBySpec('current');
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v1/entries/current',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v1/entries/current', expect.any(Object));
     });
   });
 
@@ -138,9 +134,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v1/entries', async () => {
       client.post.mockResolvedValue({ data: [] });
       await service.createEntries([{ sgv: 100 }]);
-      expect(client.post).toHaveBeenCalledWith('/api/v1/entries', [
-        { sgv: 100 },
-      ]);
+      expect(client.post).toHaveBeenCalledWith('/api/v1/entries', [{ sgv: 100 }]);
     });
   });
 
@@ -148,10 +142,7 @@ describe('NightscoutService', () => {
     it('calls DELETE /api/v1/entries/:spec', async () => {
       client.delete.mockResolvedValue({ data: {} });
       await service.deleteEntries('abc');
-      expect(client.delete).toHaveBeenCalledWith(
-        '/api/v1/entries/abc',
-        expect.any(Object),
-      );
+      expect(client.delete).toHaveBeenCalledWith('/api/v1/entries/abc', expect.any(Object));
     });
   });
 
@@ -169,10 +160,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v1/treatments', async () => {
       client.post.mockResolvedValue({ data: [] });
       await service.createTreatments([{ eventType: 'Bolus' }]);
-      expect(client.post).toHaveBeenCalledWith(
-        '/api/v1/treatments',
-        expect.any(Array),
-      );
+      expect(client.post).toHaveBeenCalledWith('/api/v1/treatments', expect.any(Array));
     });
   });
 
@@ -180,10 +168,7 @@ describe('NightscoutService', () => {
     it('calls PUT /api/v1/treatments', async () => {
       client.put.mockResolvedValue({ data: {} });
       await service.updateTreatment({ eventType: 'Bolus' });
-      expect(client.put).toHaveBeenCalledWith(
-        '/api/v1/treatments',
-        expect.any(Object),
-      );
+      expect(client.put).toHaveBeenCalledWith('/api/v1/treatments', expect.any(Object));
     });
   });
 
@@ -199,10 +184,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v1/profile', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getProfiles();
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v1/profile',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v1/profile', expect.any(Object));
     });
   });
 
@@ -210,10 +192,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v1/profile', async () => {
       client.post.mockResolvedValue({ data: {} });
       await service.createProfile({ defaultProfile: 'Default' });
-      expect(client.post).toHaveBeenCalledWith(
-        '/api/v1/profile',
-        expect.any(Object),
-      );
+      expect(client.post).toHaveBeenCalledWith('/api/v1/profile', expect.any(Object));
     });
   });
 
@@ -221,10 +200,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v1/devicestatus', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getDeviceStatuses();
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v1/devicestatus',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v1/devicestatus', expect.any(Object));
     });
   });
 
@@ -232,10 +208,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v1/devicestatus', async () => {
       client.post.mockResolvedValue({ data: {} });
       await service.createDeviceStatus({ device: 'test' });
-      expect(client.post).toHaveBeenCalledWith(
-        '/api/v1/devicestatus',
-        expect.any(Object),
-      );
+      expect(client.post).toHaveBeenCalledWith('/api/v1/devicestatus', expect.any(Object));
     });
   });
 
@@ -251,10 +224,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v1/food', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getFood();
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v1/food',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v1/food', expect.any(Object));
     });
   });
 
@@ -262,10 +232,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v1/food', async () => {
       client.post.mockResolvedValue({ data: [] });
       await service.createFood([{ name: 'Apple' }]);
-      expect(client.post).toHaveBeenCalledWith(
-        '/api/v1/food',
-        expect.any(Array),
-      );
+      expect(client.post).toHaveBeenCalledWith('/api/v1/food', expect.any(Array));
     });
   });
 
@@ -273,10 +240,7 @@ describe('NightscoutService', () => {
     it('calls PUT /api/v1/food/:id', async () => {
       client.put.mockResolvedValue({ data: {} });
       await service.updateFood('f-id', { name: 'Banana' });
-      expect(client.put).toHaveBeenCalledWith(
-        '/api/v1/food/f-id',
-        expect.any(Object),
-      );
+      expect(client.put).toHaveBeenCalledWith('/api/v1/food/f-id', expect.any(Object));
     });
   });
 
@@ -292,10 +256,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v1/activity', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getActivity();
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v1/activity',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v1/activity', expect.any(Object));
     });
   });
 
@@ -321,10 +282,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v3/entries', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getV3Entries();
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v3/entries',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v3/entries', expect.any(Object));
     });
   });
 
@@ -340,10 +298,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v3/entries', async () => {
       client.post.mockResolvedValue({ data: {} });
       await service.createV3Entry({ sgv: 100 });
-      expect(client.post).toHaveBeenCalledWith(
-        '/api/v3/entries',
-        expect.any(Object),
-      );
+      expect(client.post).toHaveBeenCalledWith('/api/v3/entries', expect.any(Object));
     });
   });
 
@@ -351,10 +306,7 @@ describe('NightscoutService', () => {
     it('calls PUT /api/v3/entries/:id', async () => {
       client.put.mockResolvedValue({ data: {} });
       await service.updateV3Entry('e-id', { sgv: 110 });
-      expect(client.put).toHaveBeenCalledWith(
-        '/api/v3/entries/e-id',
-        expect.any(Object),
-      );
+      expect(client.put).toHaveBeenCalledWith('/api/v3/entries/e-id', expect.any(Object));
     });
   });
 
@@ -362,10 +314,7 @@ describe('NightscoutService', () => {
     it('calls PATCH /api/v3/entries/:id', async () => {
       client.patch.mockResolvedValue({ data: {} });
       await service.patchV3Entry('e-id', { sgv: 90 });
-      expect(client.patch).toHaveBeenCalledWith(
-        '/api/v3/entries/e-id',
-        expect.any(Object),
-      );
+      expect(client.patch).toHaveBeenCalledWith('/api/v3/entries/e-id', expect.any(Object));
     });
   });
 
@@ -381,10 +330,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v3/treatments', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getV3Treatments();
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v3/treatments',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v3/treatments', expect.any(Object));
     });
   });
 
@@ -400,10 +346,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v3/treatments', async () => {
       client.post.mockResolvedValue({ data: {} });
       await service.createV3Treatment({ eventType: 'Bolus' });
-      expect(client.post).toHaveBeenCalledWith(
-        '/api/v3/treatments',
-        expect.any(Object),
-      );
+      expect(client.post).toHaveBeenCalledWith('/api/v3/treatments', expect.any(Object));
     });
   });
 
@@ -411,10 +354,7 @@ describe('NightscoutService', () => {
     it('calls PUT /api/v3/treatments/:id', async () => {
       client.put.mockResolvedValue({ data: {} });
       await service.updateV3Treatment('t-id', { eventType: 'Bolus' });
-      expect(client.put).toHaveBeenCalledWith(
-        '/api/v3/treatments/t-id',
-        expect.any(Object),
-      );
+      expect(client.put).toHaveBeenCalledWith('/api/v3/treatments/t-id', expect.any(Object));
     });
   });
 
@@ -422,10 +362,7 @@ describe('NightscoutService', () => {
     it('calls PATCH /api/v3/treatments/:id', async () => {
       client.patch.mockResolvedValue({ data: {} });
       await service.patchV3Treatment('t-id', { eventType: 'Bolus' });
-      expect(client.patch).toHaveBeenCalledWith(
-        '/api/v3/treatments/t-id',
-        expect.any(Object),
-      );
+      expect(client.patch).toHaveBeenCalledWith('/api/v3/treatments/t-id', expect.any(Object));
     });
   });
 
@@ -441,10 +378,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v3/devicestatus', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getV3DeviceStatuses();
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v3/devicestatus',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v3/devicestatus', expect.any(Object));
     });
   });
 
@@ -460,10 +394,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v3/devicestatus', async () => {
       client.post.mockResolvedValue({ data: {} });
       await service.createV3DeviceStatus({ device: 'test' });
-      expect(client.post).toHaveBeenCalledWith(
-        '/api/v3/devicestatus',
-        expect.any(Object),
-      );
+      expect(client.post).toHaveBeenCalledWith('/api/v3/devicestatus', expect.any(Object));
     });
   });
 
@@ -479,10 +410,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v3/profile', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getV3Profiles();
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v3/profile',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v3/profile', expect.any(Object));
     });
   });
 
@@ -498,10 +426,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v3/profile', async () => {
       client.post.mockResolvedValue({ data: {} });
       await service.createV3Profile({ defaultProfile: 'Default' });
-      expect(client.post).toHaveBeenCalledWith(
-        '/api/v3/profile',
-        expect.any(Object),
-      );
+      expect(client.post).toHaveBeenCalledWith('/api/v3/profile', expect.any(Object));
     });
   });
 
@@ -509,10 +434,7 @@ describe('NightscoutService', () => {
     it('calls PUT /api/v3/profile/:id', async () => {
       client.put.mockResolvedValue({ data: {} });
       await service.updateV3Profile('p-id', { defaultProfile: 'Default' });
-      expect(client.put).toHaveBeenCalledWith(
-        '/api/v3/profile/p-id',
-        expect.any(Object),
-      );
+      expect(client.put).toHaveBeenCalledWith('/api/v3/profile/p-id', expect.any(Object));
     });
   });
 
@@ -528,10 +450,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v3/food', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getV3Food();
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v3/food',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v3/food', expect.any(Object));
     });
   });
 
@@ -547,10 +466,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v3/food', async () => {
       client.post.mockResolvedValue({ data: {} });
       await service.createV3Food({ name: 'Apple' });
-      expect(client.post).toHaveBeenCalledWith(
-        '/api/v3/food',
-        expect.any(Object),
-      );
+      expect(client.post).toHaveBeenCalledWith('/api/v3/food', expect.any(Object));
     });
   });
 
@@ -558,10 +474,7 @@ describe('NightscoutService', () => {
     it('calls PUT /api/v3/food/:id', async () => {
       client.put.mockResolvedValue({ data: {} });
       await service.updateV3Food('f-id', { name: 'Banana' });
-      expect(client.put).toHaveBeenCalledWith(
-        '/api/v3/food/f-id',
-        expect.any(Object),
-      );
+      expect(client.put).toHaveBeenCalledWith('/api/v3/food/f-id', expect.any(Object));
     });
   });
 
@@ -577,10 +490,7 @@ describe('NightscoutService', () => {
     it('calls GET /api/v3/activity', async () => {
       client.get.mockResolvedValue({ data: [] });
       await service.getV3Activity();
-      expect(client.get).toHaveBeenCalledWith(
-        '/api/v3/activity',
-        expect.any(Object),
-      );
+      expect(client.get).toHaveBeenCalledWith('/api/v3/activity', expect.any(Object));
     });
   });
 
@@ -596,10 +506,7 @@ describe('NightscoutService', () => {
     it('calls POST /api/v3/activity', async () => {
       client.post.mockResolvedValue({ data: {} });
       await service.createV3Activity({ eventType: 'Exercise' });
-      expect(client.post).toHaveBeenCalledWith(
-        '/api/v3/activity',
-        expect.any(Object),
-      );
+      expect(client.post).toHaveBeenCalledWith('/api/v3/activity', expect.any(Object));
     });
   });
 
@@ -607,10 +514,7 @@ describe('NightscoutService', () => {
     it('calls PUT /api/v3/activity/:id', async () => {
       client.put.mockResolvedValue({ data: {} });
       await service.updateV3Activity('a-id', { eventType: 'Exercise' });
-      expect(client.put).toHaveBeenCalledWith(
-        '/api/v3/activity/a-id',
-        expect.any(Object),
-      );
+      expect(client.put).toHaveBeenCalledWith('/api/v3/activity/a-id', expect.any(Object));
     });
   });
 
@@ -709,9 +613,7 @@ describe('NightscoutService', () => {
 
   describe('getLastPumpChange()', () => {
     it('returns treatment and elapsed days', async () => {
-      const twoHoursAgo = new Date(
-        Date.now() - 2 * 60 * 60 * 1000,
-      ).toISOString();
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
       client.get.mockResolvedValue({
         data: [{ eventType: 'Site Change', created_at: twoHoursAgo }],
       });
@@ -740,9 +642,7 @@ describe('NightscoutService', () => {
 
   describe('getLastSensorChange()', () => {
     it('returns treatment and elapsed days', async () => {
-      const oneDayAgo = new Date(
-        Date.now() - 24 * 60 * 60 * 1000,
-      ).toISOString();
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       client.get.mockResolvedValue({
         data: [{ eventType: 'Sensor Change', created_at: oneDayAgo }],
       });
