@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.0](https://github.com/DiaKEM/control-center/compare/v0.6.0...v0.7.0) (2026-03-29)
+
+### Features
+
+* **no-ref:** add auto refresh to dashboard nightscout widget ([89b06c0](https://github.com/DiaKEM/control-center/commit/89b06c04714bb59e4e396ef56bcbeec912764652))
+* **no-ref:** add code coverage to readme.md ([249e21d](https://github.com/DiaKEM/control-center/commit/249e21de6b807cff1b42b7608c397809f2e3bc61))
+* **no-ref:** add dashboard to app ([91dbd14](https://github.com/DiaKEM/control-center/commit/91dbd141447bbc55d0f66aeaa2f846706116aca9))
+* **no-ref:** add github action for ci ([910eab5](https://github.com/DiaKEM/control-center/commit/910eab5abf9cc4fa3448778c01baeaf6357e56ce))
+* **no-ref:** add scripts to package.json ([5cb56dd](https://github.com/DiaKEM/control-center/commit/5cb56ddea3d3b9b24abd20956469fa26744d969b))
+* **no-ref:** integrate husky and lint-staged ([6bf1a08](https://github.com/DiaKEM/control-center/commit/6bf1a08ee22aaf3cca11ff82a098f0ca60650904))
+* **no-ref:** switch to oxlint and oxfmt ([f0f1daa](https://github.com/DiaKEM/control-center/commit/f0f1daa894aaa4a1781008e3418f77fb8b3722e7))
+
+### Bug Fixes
+
+* **no-ref:** uninstall sharp before installing ([84c09d6](https://github.com/DiaKEM/control-center/commit/84c09d6e72dcc48c0c4305f97b96d2c94b1d52b1))
+
 ## [0.6.0](https://github.com/DiaKEM/control-center/compare/v0.5.3...v0.6.0) (2026-03-29)
 
 ### Features
