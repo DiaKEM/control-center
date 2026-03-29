@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.1](https://github.com/DiaKEM/control-center/compare/v0.7.0...v0.7.1) (2026-03-29)
+
+### Bug Fixes
+
+* **no-ref:** fix toFixed() on null ([fadee9f](https://github.com/DiaKEM/control-center/commit/fadee9f73db2ba14a64400611c680641f7a36de4))
+
 ## [0.7.0](https://github.com/DiaKEM/control-center/compare/v0.6.0...v0.7.0) (2026-03-29)
 
 ### Features

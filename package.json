@@ -1,6 +1,6 @@
 {
   "name": "diakem-control-center",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "scripts": {
     "build:package": "bash scripts/build-package.sh $(node -p \"require('./package.json').version\")",
