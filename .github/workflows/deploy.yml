@@ -64,6 +64,7 @@ jobs:
             cd ${APP_DIR}/backend
             
             # Configuration
+            npm uninstall sharp
             MAX_RETRIES=5
             COUNT=0
             COMMAND="npm install --platform=linux --arch=x64 sharp@0.32.6"
