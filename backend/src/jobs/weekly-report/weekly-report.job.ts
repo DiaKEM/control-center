@@ -33,6 +33,29 @@ export class WeeklyReportJob extends ReportJobBase {
     return this.glucoseChart.renderDonut(stats, this.reportTitle);
   }
 
+  protected async getAdditionalImages(stats: GlucoseReportStats): Promise<Array<{ buffer: Buffer; caption: string }>> {
+    const avgCaption = 'Daily Averages – Last 7 Days';
+    const avgBuffer = await this.glucoseChart.renderLineChart(
+      stats.dailyAverages,
+      stats.unit,
+      stats.ranges,
+      avgCaption,
+    );
+
+    const tirCaption = 'Daily Time in Range – Last 7 Days';
+    const inRangeName = stats.ranges.find((r) => r.name === 'In Range')?.name ?? 'In Range';
+    const tirBuffer = await this.glucoseChart.renderTirLineChart(
+      stats.dailyTir,
+      inRangeName,
+      tirCaption,
+    );
+
+    return [
+      { buffer: avgBuffer, caption: avgCaption },
+      { buffer: tirBuffer, caption: tirCaption },
+    ];
+  }
+
   protected getTimeWindow(): { from: Date; to: Date } | { error: string } {
     const to = new Date();
     const from = new Date(to);

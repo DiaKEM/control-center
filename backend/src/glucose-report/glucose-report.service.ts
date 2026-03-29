@@ -53,6 +53,7 @@ const DEFAULT_RANGES_MMOL: Array<{
   { name: 'Very High', lowerLimit: 13.9, upperLimit: 22.2 },
 ];
 
+const SEPARATOR = '───────────────────────────────────────';
 @Injectable()
 export class GlucoseReportService {
   constructor(
@@ -314,11 +315,12 @@ export class GlucoseReportService {
 
     const lines = [
       `📅 ${periodLabel}`,
+      SEPARATOR,
+      `📈 *Average*: ${stats.average} ${u}`,
+      `🎯 *Time in Range*: ${stats.tir}%  ${bar(stats.tir)}`,
+      SEPARATOR,
+      '*Range breakdown*:',
       '',
-      `📈 Average: ${stats.average} ${u}`,
-      `🎯 Time in Range: ${stats.tir}%  ${bar(stats.tir)}`,
-      '',
-      'Range breakdown:',
       ...stats.ranges.map((r) => {
         const emoji = RANGE_EMOJI[r.name] ?? '⚪';
         return `${emoji} ${r.name} (${r.lowerLimit}–${r.upperLimit} ${u}): ${r.percentage}%  ${bar(r.percentage)}`;
