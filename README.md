@@ -1,5 +1,9 @@
 # Diakem Notify control center
 
+[![CI](https://github.com/DiaKEM/control-center/actions/workflows/ci.yml/badge.svg)](https://github.com/DiaKEM/control-center/actions/workflows/ci.yml)
+[![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io)
+[![Node 22](https://img.shields.io/badge/node-22-brightgreen.svg)](https://nodejs.org)
+
 ## Project setup
 
 ```bash
