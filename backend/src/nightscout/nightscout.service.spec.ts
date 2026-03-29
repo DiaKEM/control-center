@@ -47,6 +47,7 @@ describe('NightscoutService', () => {
 
   describe('constructor', () => {
     it('strips trailing slash from base URL', () => {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(axios.create).toHaveBeenCalledWith(
         expect.objectContaining({ baseURL: 'http://nightscout.test' }),
       );

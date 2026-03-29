@@ -1,13 +1,13 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import type { LoginResponse } from '@/features/auth/authApi'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import type { LoginResponse } from '@/features/auth/authApi';
 
 export interface SetupStatus {
-  installed: boolean
+  installed: boolean;
 }
 
 export interface InstallRequest {
-  username: string
-  password: string
+  username: string;
+  password: string;
 }
 
 export const setupApi = createApi({
@@ -21,6 +21,6 @@ export const setupApi = createApi({
       query: (body) => ({ url: '/setup/install', method: 'POST', body }),
     }),
   }),
-})
+});
 
-export const { useGetSetupStatusQuery, useInstallMutation } = setupApi
+export const { useGetSetupStatusQuery, useInstallMutation } = setupApi;

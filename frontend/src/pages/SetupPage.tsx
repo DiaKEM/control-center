@@ -1,11 +1,11 @@
-import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAppDispatch } from '@/app/hooks'
-import { setCredentials } from '@/features/auth/authSlice'
-import { setupApi, useInstallMutation } from '@/features/setup/setupApi'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '@/app/hooks';
+import { setCredentials } from '@/features/auth/authSlice';
+import { setupApi, useInstallMutation } from '@/features/setup/setupApi';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
@@ -13,43 +13,57 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@/components/ui/card';
 
 export default function SetupPage() {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [validationError, setValidationError] = useState<string | null>(null)
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  const dispatch = useAppDispatch()
-  const navigate = useNavigate()
-  const [install, { isLoading, error }] = useInstallMutation()
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [install, { isLoading, error }] = useInstallMutation();
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    setValidationError(null)
+    e.preventDefault();
+    setValidationError(null);
 
     if (password !== confirmPassword) {
-      setValidationError('Passwords do not match.')
-      return
+      setValidationError('Passwords do not match.');
+      return;
     }
 
     try {
-      const result = await install({ username, password }).unwrap()
-      dispatch(setCredentials({ token: result.access_token, username: result.user.username }))
-      dispatch(setupApi.util.updateQueryData('getSetupStatus', undefined, () => ({ installed: true })))
-      navigate('/admin')
+      const result = await install({ username, password }).unwrap();
+      dispatch(
+        setCredentials({
+          token: result.access_token,
+          username: result.user.username,
+        }),
+      );
+      dispatch(
+        setupApi.util.updateQueryData('getSetupStatus', undefined, () => ({
+          installed: true,
+        })),
+      );
+      navigate('/admin');
     } catch {
       // error handled via RTK Query state
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="flex w-full max-w-sm flex-col items-center gap-8">
-        <img src="/images/logo.png" alt="Diakem Notify" className="h-44 w-auto" />
+        <img
+          src="/images/logo.png"
+          alt="Diakem Notify"
+          className="h-44 w-auto"
+        />
         <h1 className="text-center text-2xl font-bold tracking-tight leading-tight">
-          <span style={{ color: '#2879C0' }}>Dia</span><span style={{ color: '#3D8B3D' }}>KEM</span>
+          <span style={{ color: '#2879C0' }}>Dia</span>
+          <span style={{ color: '#3D8B3D' }}>KEM</span>
           <br />
           <span>Control Center</span>
         </h1>
@@ -116,5 +130,5 @@ export default function SetupPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

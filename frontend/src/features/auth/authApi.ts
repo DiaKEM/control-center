@@ -1,16 +1,16 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export interface LoginRequest {
-  username: string
-  password: string
+  username: string;
+  password: string;
 }
 
 export interface LoginResponse {
-  access_token: string
+  access_token: string;
   user: {
-    id: string
-    username: string
-  }
+    id: string;
+    username: string;
+  };
 }
 
 // Auth endpoints are public — no need for the shared auth baseQuery
@@ -26,6 +26,6 @@ export const authApi = createApi({
       }),
     }),
   }),
-})
+});
 
-export const { useLoginMutation } = authApi
+export const { useLoginMutation } = authApi;

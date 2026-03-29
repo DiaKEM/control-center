@@ -224,17 +224,18 @@ export class AdminController {
         .toArray(),
     ]);
 
-    const jobStats = collStats[0]?.storageStats;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const jobStats = collStats[0]?.storageStats as
+      | { count: number; size: number }
+      | undefined;
 
     return {
       totalSizeMb: +(dbStats.totalSize / 1024 / 1024).toFixed(2),
       storageSizeMb: +(dbStats.storageSize / 1024 / 1024).toFixed(2),
       collections: dbStats.collections as number,
       jobExecutions: {
-        count: (jobStats?.count as number) ?? 0,
-        sizeMb: jobStats
-          ? +((jobStats.size as number) / 1024 / 1024).toFixed(2)
-          : 0,
+        count: jobStats?.count ?? 0,
+        sizeMb: jobStats ? +(jobStats.size / 1024 / 1024).toFixed(2) : 0,
       },
     };
   }

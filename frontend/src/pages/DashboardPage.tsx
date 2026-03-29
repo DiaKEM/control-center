@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Activity,
   AlertTriangle,
@@ -20,9 +20,9 @@ import {
   Loader2,
   Minus,
   RefreshCw,
-} from 'lucide-react'
-import { useAppSelector } from '@/app/hooks'
-import { selectUsername } from '@/features/auth/authSlice'
+} from 'lucide-react';
+import { useAppSelector } from '@/app/hooks';
+import { selectUsername } from '@/features/auth/authSlice';
 import {
   useGetAdminConfigQuery,
   useTestConnectionMutation,
@@ -30,32 +30,32 @@ import {
   useGetSchedulerConfigQuery,
   useGetNightscoutInfoQuery,
   type NightscoutInfo,
-} from '@/features/admin/adminApi'
-import { useGetJobExecutionsQuery } from '@/features/job-execution/jobExecutionApi'
-import { useGetJobConfigurationsQuery } from '@/features/job-configuration/jobConfigurationApi'
-import { cn } from '@/lib/utils'
+} from '@/features/admin/adminApi';
+import { useGetJobExecutionsQuery } from '@/features/job-execution/jobExecutionApi';
+import { useGetJobConfigurationsQuery } from '@/features/job-configuration/jobConfigurationApi';
+import { cn } from '@/lib/utils';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
 function isToday(dateStr: string) {
-  const d = new Date(dateStr)
-  const now = new Date()
+  const d = new Date(dateStr);
+  const now = new Date();
   return (
     d.getFullYear() === now.getFullYear() &&
     d.getMonth() === now.getMonth() &&
     d.getDate() === now.getDate()
-  )
+  );
 }
 
 function formatNextRun(iso: string | null) {
-  if (!iso) return 'Not scheduled'
-  const d = new Date(iso)
+  if (!iso) return 'Not scheduled';
+  const d = new Date(iso);
   return d.toLocaleString(undefined, {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  })
+  });
 }
 
 // ─── stat card ────────────────────────────────────────────────────────────────
@@ -67,23 +67,25 @@ function StatCard({
   accent,
   sub,
 }: {
-  label: string
-  value: string | number
-  icon: React.ElementType
-  accent?: 'green' | 'red' | 'blue' | 'yellow'
-  sub?: string
+  label: string;
+  value: string | number;
+  icon: React.ElementType;
+  accent?: 'green' | 'red' | 'blue' | 'yellow';
+  sub?: string;
 }) {
   const accentClass = {
     green: 'text-green-600',
     red: 'text-red-500',
     blue: 'text-blue-600',
     yellow: 'text-yellow-500',
-  }[accent ?? 'blue']
+  }[accent ?? 'blue'];
 
   return (
     <div className="rounded-lg border bg-card p-5 shadow-sm flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground font-medium">{label}</span>
+        <span className="text-sm text-muted-foreground font-medium">
+          {label}
+        </span>
         <Icon className={cn('h-4 w-4', accentClass)} />
       </div>
       <div>
@@ -91,15 +93,39 @@ function StatCard({
         {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
       </div>
     </div>
-  )
+  );
+}
+
+// ─── glucose helpers ──────────────────────────────────────────────────────────
+
+function formatGlucoseTime(ms: number | null) {
+  if (!ms) return null;
+  const diff = Math.round((Date.now() - ms) / 60_000);
+  if (diff < 1) return 'just now';
+  if (diff < 60) return `${diff}m ago`;
+  return `${Math.floor(diff / 60)}h ${diff % 60}m ago`;
+}
+
+function glucoseAgeColor(ms: number | null) {
+  if (!ms) return 'text-muted-foreground';
+  const diff = (Date.now() - ms) / 60_000;
+  if (diff <= 5) return 'text-green-600 dark:text-green-400';
+  if (diff <= 6) return 'text-yellow-500 dark:text-yellow-400';
+  return 'text-red-500';
 }
 
 // ─── nightscout status banner ─────────────────────────────────────────────────
 
-type NsStatus = 'checking' | 'ok' | 'error' | 'unconfigured'
+type NsStatus = 'checking' | 'ok' | 'error' | 'unconfigured';
 
-function NightscoutBanner({ status, onRetest }: { status: NsStatus; onRetest: () => void }) {
-  if (status === 'ok' || status === 'checking') return null
+function NightscoutBanner({
+  status,
+  onRetest,
+}: {
+  status: NsStatus;
+  onRetest: () => void;
+}) {
+  if (status === 'ok' || status === 'checking') return null;
 
   return (
     <div
@@ -117,13 +143,34 @@ function NightscoutBanner({ status, onRetest }: { status: NsStatus; onRetest: ()
       )}
       <div className="flex-1">
         <p className="font-semibold">
-          {status === 'unconfigured' ? 'Nightscout not configured' : 'Nightscout connection failed'}
+          {status === 'unconfigured'
+            ? 'Nightscout not configured'
+            : 'Nightscout connection failed'}
         </p>
         <p className="mt-0.5 text-xs opacity-80">
           {status === 'unconfigured' ? (
-            <>Go to <Link to="/admin" className="underline underline-offset-2 hover:opacity-100">Administration</Link> → Nightscout to enter your URL and API key.</>
+            <>
+              Go to{' '}
+              <Link
+                to="/admin"
+                className="underline underline-offset-2 hover:opacity-100"
+              >
+                Administration
+              </Link>{' '}
+              → Nightscout to enter your URL and API key.
+            </>
           ) : (
-            <>The configured Nightscout instance could not be reached. Check the URL and API key in <Link to="/admin" className="underline underline-offset-2 hover:opacity-100">Administration</Link>.</>
+            <>
+              The configured Nightscout instance could not be reached. Check the
+              URL and API key in{' '}
+              <Link
+                to="/admin"
+                className="underline underline-offset-2 hover:opacity-100"
+              >
+                Administration
+              </Link>
+              .
+            </>
           )}
         </p>
       </div>
@@ -134,64 +181,82 @@ function NightscoutBanner({ status, onRetest }: { status: NsStatus; onRetest: ()
         Retry
       </button>
     </div>
-  )
+  );
 }
 
 // ─── page ─────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const username = useAppSelector(selectUsername)
+  const username = useAppSelector(selectUsername);
 
-  const [nsStatus, setNsStatus] = useState<NsStatus>('checking')
+  const [nsStatus, setNsStatus] = useState<NsStatus>('checking');
 
-  const { data: config, isLoading: configLoading } = useGetAdminConfigQuery()
-  const { data: dbStats } = useGetDatabaseStatsQuery()
-  const { data: scheduler } = useGetSchedulerConfigQuery()
-  const { data: executions } = useGetJobExecutionsQuery({ limit: 100 })
-  const { data: configs } = useGetJobConfigurationsQuery()
-  const { data: nsInfo, isLoading: nsInfoLoading, refetch: refetchNsInfo } = useGetNightscoutInfoQuery(undefined, { skip: nsStatus === 'unconfigured', pollingInterval: 60_000 })
+  const { data: config, isLoading: configLoading } = useGetAdminConfigQuery();
+  const { data: dbStats } = useGetDatabaseStatsQuery();
+  const { data: scheduler } = useGetSchedulerConfigQuery();
+  const { data: executions } = useGetJobExecutionsQuery({ limit: 100 });
+  const { data: configs } = useGetJobConfigurationsQuery();
+  const {
+    data: nsInfo,
+    isLoading: nsInfoLoading,
+    refetch: refetchNsInfo,
+  } = useGetNightscoutInfoQuery(undefined, {
+    skip: nsStatus === 'unconfigured',
+    pollingInterval: 60_000,
+  });
 
-  const [testConnection, { isLoading: testing }] = useTestConnectionMutation()
+  const [testConnection] = useTestConnectionMutation();
 
   // Test Nightscout connection once config is loaded
   useEffect(() => {
-    if (configLoading) return
+    if (configLoading) return;
     if (!config?.nightscout?.url) {
-      setNsStatus('unconfigured')
-      return
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setNsStatus('unconfigured');
+      return;
     }
-    setNsStatus('checking')
-    testConnection({ service: 'nightscout', config: { url: config.nightscout.url, apiKey: config.nightscout.apiKey } })
+    setNsStatus('checking');
+    testConnection({
+      service: 'nightscout',
+      config: { url: config.nightscout.url, apiKey: config.nightscout.apiKey },
+    })
       .then((res) => {
-        const ok = 'data' in res && res.data?.ok === true
-        setNsStatus(ok ? 'ok' : 'error')
+        const ok = 'data' in res && res.data?.ok === true;
+        setNsStatus(ok ? 'ok' : 'error');
       })
-      .catch(() => setNsStatus('error'))
-  }, [config, configLoading]) // eslint-disable-line react-hooks/exhaustive-deps
+      .catch(() => setNsStatus('error'));
+  }, [config, configLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRetest = () => {
-    if (!config?.nightscout?.url) { setNsStatus('unconfigured'); return }
-    setNsStatus('checking')
-    testConnection({ service: 'nightscout', config: { url: config.nightscout.url, apiKey: config.nightscout.apiKey } })
+    if (!config?.nightscout?.url) {
+      setNsStatus('unconfigured');
+      return;
+    }
+    setNsStatus('checking');
+    testConnection({
+      service: 'nightscout',
+      config: { url: config.nightscout.url, apiKey: config.nightscout.apiKey },
+    })
       .then((res) => {
-        const ok = 'data' in res && res.data?.ok === true
-        setNsStatus(ok ? 'ok' : 'error')
+        const ok = 'data' in res && res.data?.ok === true;
+        setNsStatus(ok ? 'ok' : 'error');
       })
-      .catch(() => setNsStatus('error'))
-  }
+      .catch(() => setNsStatus('error'));
+  };
 
   // Derived stats from recent executions
-  const today = executions?.filter((e) => isToday(e.startedAt)) ?? []
-  const todaySuccess = today.filter((e) => e.status === 'success').length
-  const todayFailed = today.filter((e) => e.status === 'failed').length
-  const todayNotifications = today.filter((e) => !!e.notificationSentAt).length
+  const today = executions?.filter((e) => isToday(e.startedAt)) ?? [];
+  const todaySuccess = today.filter((e) => e.status === 'success').length;
+  const todayFailed = today.filter((e) => e.status === 'failed').length;
+  const todayNotifications = today.filter((e) => !!e.notificationSentAt).length;
 
-  const pushoverOk = !!(config?.pushover?.appToken && config?.pushover?.userKey)
-  const telegramOk = !!(config?.telegram?.botToken && config?.telegram?.chatId)
+  const pushoverOk = !!(
+    config?.pushover?.appToken && config?.pushover?.userKey
+  );
+  const telegramOk = !!(config?.telegram?.botToken && config?.telegram?.chatId);
 
   return (
     <div className="flex flex-col gap-6 p-6 max-w-5xl mx-auto">
-
       {/* Welcome */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
@@ -206,7 +271,6 @@ export default function DashboardPage() {
       {!configLoading && (
         <NightscoutBanner status={nsStatus} onRetest={handleRetest} />
       )}
-
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -250,13 +314,11 @@ export default function DashboardPage() {
 
       {/* Bottom section */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
         {/* System status */}
         <div className="rounded-lg border bg-card p-5 shadow-sm flex flex-col gap-4">
           <h2 className="font-semibold text-sm">System Status</h2>
 
           <div className="flex flex-col gap-3 text-sm">
-
             {/* Scheduler */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -305,38 +367,77 @@ export default function DashboardPage() {
           <h2 className="font-semibold text-sm">Notification Providers</h2>
 
           <div className="flex flex-col gap-3 text-sm">
-            <ProviderRow label="Pushover" configured={pushoverOk} loading={configLoading} />
-            <ProviderRow label="Telegram" configured={telegramOk} loading={configLoading} />
+            <ProviderRow
+              label="Pushover"
+              configured={pushoverOk}
+              loading={configLoading}
+            />
+            <ProviderRow
+              label="Telegram"
+              configured={telegramOk}
+              loading={configLoading}
+            />
           </div>
 
           <p className="text-xs text-muted-foreground mt-auto">
-            <Link to="/admin" className="underline underline-offset-2 hover:text-foreground transition-colors">
+            <Link
+              to="/admin"
+              className="underline underline-offset-2 hover:text-foreground transition-colors"
+            >
               Configure in Administration
             </Link>
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Nightscout info widget ───────────────────────────────────────────────────
 
-const TREND_MAP: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  DoubleUp:       { label: '↑↑ Rising fast',    icon: TrendingUp,   color: 'text-red-500' },
-  SingleUp:       { label: '↑ Rising',           icon: TrendingUp,   color: 'text-orange-500' },
-  FortyFiveUp:    { label: '↗ Rising slowly',    icon: TrendingUp,   color: 'text-yellow-500' },
-  Flat:           { label: '→ Stable',           icon: Minus,        color: 'text-green-600' },
-  FortyFiveDown:  { label: '↘ Falling slowly',   icon: TrendingDown, color: 'text-yellow-500' },
-  SingleDown:     { label: '↓ Falling',          icon: TrendingDown, color: 'text-orange-500' },
-  DoubleDown:     { label: '↓↓ Falling fast',    icon: TrendingDown, color: 'text-red-500' },
-}
+const TREND_MAP: Record<
+  string,
+  { label: string; icon: React.ElementType; color: string }
+> = {
+  DoubleUp: {
+    label: '↑↑ Rising fast',
+    icon: TrendingUp,
+    color: 'text-red-500',
+  },
+  SingleUp: { label: '↑ Rising', icon: TrendingUp, color: 'text-orange-500' },
+  FortyFiveUp: {
+    label: '↗ Rising slowly',
+    icon: TrendingUp,
+    color: 'text-yellow-500',
+  },
+  Flat: { label: '→ Stable', icon: Minus, color: 'text-green-600' },
+  FortyFiveDown: {
+    label: '↘ Falling slowly',
+    icon: TrendingDown,
+    color: 'text-yellow-500',
+  },
+  SingleDown: {
+    label: '↓ Falling',
+    icon: TrendingDown,
+    color: 'text-orange-500',
+  },
+  DoubleDown: {
+    label: '↓↓ Falling fast',
+    icon: TrendingDown,
+    color: 'text-red-500',
+  },
+};
 
-function InfoRow({ label, value, icon: Icon, valueClass }: {
-  label: string
-  value: React.ReactNode
-  icon: React.ElementType
-  valueClass?: string
+function InfoRow({
+  label,
+  value,
+  icon: Icon,
+  valueClass,
+}: {
+  label: string;
+  value: React.ReactNode;
+  icon: React.ElementType;
+  valueClass?: string;
 }) {
   return (
     <div className="flex items-center justify-between">
@@ -344,9 +445,11 @@ function InfoRow({ label, value, icon: Icon, valueClass }: {
         <Icon className="h-4 w-4 shrink-0" />
         {label}
       </div>
-      <span className={cn('text-sm font-medium text-right', valueClass)}>{value}</span>
+      <span className={cn('text-sm font-medium text-right', valueClass)}>
+        {value}
+      </span>
     </div>
-  )
+  );
 }
 
 function NightscoutInfoWidget({
@@ -355,33 +458,19 @@ function NightscoutInfoWidget({
   onRefresh,
   nsStatus,
 }: {
-  info: NightscoutInfo | null
-  loading: boolean
-  onRefresh: () => void
-  nsStatus: NsStatus
+  info: NightscoutInfo | null;
+  loading: boolean;
+  onRefresh: () => void;
+  nsStatus: NsStatus;
 }) {
-  const trend = info?.latestGlucose?.direction ? TREND_MAP[info.latestGlucose.direction] : null
+  const trend = info?.latestGlucose?.direction
+    ? TREND_MAP[info.latestGlucose.direction]
+    : null;
 
   const formatAge = (days: number) => {
-    if (days < 1) return `${Math.round(days * 24)}h`
-    return `${days.toFixed(1)}d`
-  }
-
-  const formatGlucoseTime = (ms: number | null) => {
-    if (!ms) return null
-    const diff = Math.round((Date.now() - ms) / 60_000)
-    if (diff < 1) return 'just now'
-    if (diff < 60) return `${diff}m ago`
-    return `${Math.floor(diff / 60)}h ${diff % 60}m ago`
-  }
-
-  const glucoseAgeColor = (ms: number | null) => {
-    if (!ms) return 'text-muted-foreground'
-    const diff = (Date.now() - ms) / 60_000
-    if (diff <= 5) return 'text-green-600 dark:text-green-400'
-    if (diff <= 6) return 'text-yellow-500 dark:text-yellow-400'
-    return 'text-red-500'
-  }
+    if (days < 1) return `${Math.round(days * 24)}h`;
+    return `${days.toFixed(1)}d`;
+  };
 
   return (
     <div className="rounded-lg border bg-card p-5 shadow-sm flex flex-col gap-4">
@@ -406,7 +495,9 @@ function NightscoutInfoWidget({
             className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
             aria-label="Refresh"
           >
-            <RefreshCw className={cn('h-3.5 w-3.5', loading && 'animate-spin')} />
+            <RefreshCw
+              className={cn('h-3.5 w-3.5', loading && 'animate-spin')}
+            />
           </button>
         </div>
       </div>
@@ -418,21 +509,31 @@ function NightscoutInfoWidget({
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-
           {/* Latest glucose */}
           <div className="flex flex-col gap-3">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Glucose</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Glucose
+            </p>
             {info?.latestGlucose ? (
               <>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold">{info.latestGlucose.sgv}</span>
+                  <span className="text-3xl font-bold">
+                    {info.latestGlucose.sgv}
+                  </span>
                   <span className="text-sm text-muted-foreground">mg/dL</span>
                   {trend && (
-                    <span className={cn('text-sm font-medium', trend.color)}>{trend.label}</span>
+                    <span className={cn('text-sm font-medium', trend.color)}>
+                      {trend.label}
+                    </span>
                   )}
                 </div>
                 {info.latestGlucose.date && (
-                  <span className={cn('text-xs font-medium -mt-2', glucoseAgeColor(info.latestGlucose.date))}>
+                  <span
+                    className={cn(
+                      'text-xs font-medium -mt-2',
+                      glucoseAgeColor(info.latestGlucose.date),
+                    )}
+                  >
                     {formatGlucoseTime(info.latestGlucose.date)}
                   </span>
                 )}
@@ -444,17 +545,31 @@ function NightscoutInfoWidget({
 
           {/* Device details */}
           <div className="flex flex-col gap-3">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Device</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Device
+            </p>
             <div className="flex flex-col gap-2">
               {info?.battery ? (
                 <InfoRow
                   label="Battery"
                   icon={info.battery.isCharging ? BatteryCharging : Battery}
                   value={
-                    <span className={cn(info.battery.level <= 20 ? 'text-red-500' : 'text-foreground')}>
+                    <span
+                      className={cn(
+                        info.battery.level <= 20
+                          ? 'text-red-500'
+                          : 'text-foreground',
+                      )}
+                    >
                       {info.battery.level}%
-                      {info.battery.isCharging === true && <span className="text-green-600 ml-1">⚡</span>}
-                      {info.battery.isCharging === false && <span className="text-muted-foreground ml-1 text-xs">unplugged</span>}
+                      {info.battery.isCharging === true && (
+                        <span className="text-green-600 ml-1">⚡</span>
+                      )}
+                      {info.battery.isCharging === false && (
+                        <span className="text-muted-foreground ml-1 text-xs">
+                          unplugged
+                        </span>
+                      )}
                     </span>
                   }
                 />
@@ -465,27 +580,49 @@ function NightscoutInfoWidget({
               <InfoRow
                 label="Reservoir"
                 icon={Droplets}
-                value={info?.reservoirLevel != null ? `${info.reservoirLevel} U` : '—'}
-                valueClass={info?.reservoirLevel != null && info.reservoirLevel < 20 ? 'text-red-500' : undefined}
+                value={
+                  info?.reservoirLevel != null
+                    ? `${info.reservoirLevel} U`
+                    : '—'
+                }
+                valueClass={
+                  info?.reservoirLevel != null && info.reservoirLevel < 20
+                    ? 'text-red-500'
+                    : undefined
+                }
               />
             </div>
           </div>
 
           {/* Sensor & pump ages */}
           <div className="flex flex-col gap-3 sm:col-span-2 border-t pt-3">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Consumables</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Consumables
+            </p>
             <div className="flex flex-col gap-2">
               <InfoRow
                 label="Sensor age"
                 icon={Activity}
                 value={info?.sensor ? formatAge(info.sensor.elapsedDays) : '—'}
-                valueClass={info?.sensor && info.sensor.elapsedDays > 10 ? 'text-red-500' : info?.sensor && info.sensor.elapsedDays > 7 ? 'text-yellow-500' : undefined}
+                valueClass={
+                  info?.sensor && info.sensor.elapsedDays > 10
+                    ? 'text-red-500'
+                    : info?.sensor && info.sensor.elapsedDays > 7
+                      ? 'text-yellow-500'
+                      : undefined
+                }
               />
               <InfoRow
                 label="Pump site age"
                 icon={Syringe}
                 value={info?.pump ? formatAge(info.pump.elapsedDays) : '—'}
-                valueClass={info?.pump && info.pump.elapsedDays > 3 ? 'text-red-500' : info?.pump && info.pump.elapsedDays > 2 ? 'text-yellow-500' : undefined}
+                valueClass={
+                  info?.pump && info.pump.elapsedDays > 3
+                    ? 'text-red-500'
+                    : info?.pump && info.pump.elapsedDays > 2
+                      ? 'text-yellow-500'
+                      : undefined
+                }
               />
             </div>
           </div>
@@ -501,10 +638,18 @@ function NightscoutInfoWidget({
         </div>
       )}
     </div>
-  )
+  );
 }
 
-function ProviderRow({ label, configured, loading }: { label: string; configured: boolean; loading: boolean }) {
+function ProviderRow({
+  label,
+  configured,
+  loading,
+}: {
+  label: string;
+  configured: boolean;
+  loading: boolean;
+}) {
   return (
     <div className="flex items-center justify-between">
       <span className="text-muted-foreground">{label}</span>
@@ -522,5 +667,5 @@ function ProviderRow({ label, configured, loading }: { label: string; configured
         </span>
       )}
     </div>
-  )
+  );
 }

@@ -1,7 +1,5 @@
 import { NotificationCheckerService } from './notification-checker.service';
 
-const TIME_POINT_WINDOW_MS = 3 * 60 * 1000;
-
 const makeExec = (value: unknown) => jest.fn().mockResolvedValue(value);
 const makeModelQuery = (value: unknown) => ({
   sort: jest.fn().mockReturnValue({ exec: makeExec(value) }),

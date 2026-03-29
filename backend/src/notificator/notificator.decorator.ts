@@ -7,6 +7,7 @@ import {
 export function NotificatorProvider(
   key: NotificatorProviderKey,
 ): ClassDecorator {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   return (target: Function) => {
     NOTIFICATOR_PROVIDER_STORE.set(
       key,

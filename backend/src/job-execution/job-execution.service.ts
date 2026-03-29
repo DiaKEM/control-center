@@ -6,7 +6,6 @@ import {
   JobExecution,
   JobExecutionDocument,
 } from './job-execution.schema';
-import { JobConfiguration } from '../job-configuration/job-configuration.schema';
 import { JobExecutionContext } from './job-execution.context';
 
 @Injectable()

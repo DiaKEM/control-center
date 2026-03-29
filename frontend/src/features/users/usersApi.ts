@@ -1,24 +1,24 @@
-import { createApi } from '@reduxjs/toolkit/query/react'
-import { baseQueryWithAuth } from '@/app/baseQuery'
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithAuth } from '@/app/baseQuery';
 
-export type UserRole = 'admin' | 'user'
+export type UserRole = 'admin' | 'user';
 
 export interface User {
-  _id: string
-  username: string
-  roles: UserRole[]
-  createdAt: string
+  _id: string;
+  username: string;
+  roles: UserRole[];
+  createdAt: string;
 }
 
 export interface CreateUserRequest {
-  username: string
-  password: string
-  roles: UserRole[]
+  username: string;
+  password: string;
+  roles: UserRole[];
 }
 
 export interface UpdateUserRequest {
-  roles?: UserRole[]
-  password?: string
+  roles?: UserRole[];
+  password?: string;
 }
 
 export const usersApi = createApi({
@@ -35,7 +35,11 @@ export const usersApi = createApi({
       invalidatesTags: ['User'],
     }),
     updateUser: builder.mutation<User, { id: string } & UpdateUserRequest>({
-      query: ({ id, ...body }) => ({ url: `/users/${id}`, method: 'PATCH', body }),
+      query: ({ id, ...body }) => ({
+        url: `/users/${id}`,
+        method: 'PATCH',
+        body,
+      }),
       invalidatesTags: ['User'],
     }),
     deleteUser: builder.mutation<void, string>({
@@ -43,6 +47,11 @@ export const usersApi = createApi({
       invalidatesTags: ['User'],
     }),
   }),
-})
+});
 
-export const { useGetUsersQuery, useCreateUserMutation, useUpdateUserMutation, useDeleteUserMutation } = usersApi
+export const {
+  useGetUsersQuery,
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} = usersApi;

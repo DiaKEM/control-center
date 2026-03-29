@@ -1,46 +1,50 @@
-import { createApi } from '@reduxjs/toolkit/query/react'
-import { baseQueryWithAuth } from '@/app/baseQuery'
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQueryWithAuth } from '@/app/baseQuery';
 
 export interface AdminConfig {
-  nightscout: { url: string; apiKey: string }
-  pushover: { appToken: string; userKey: string }
-  telegram: { botToken: string; chatId: string }
+  nightscout: { url: string; apiKey: string };
+  pushover: { appToken: string; userKey: string };
+  telegram: { botToken: string; chatId: string };
 }
 
 export interface SchedulerConfig {
-  expression: string
-  nextRun: string | null
+  expression: string;
+  nextRun: string | null;
 }
 
 export interface DatabaseStats {
-  totalSizeMb: number
-  storageSizeMb: number
-  collections: number
-  jobExecutions: { count: number; sizeMb: number }
+  totalSizeMb: number;
+  storageSizeMb: number;
+  collections: number;
+  jobExecutions: { count: number; sizeMb: number };
 }
 
-export type GlucoseUnit = 'mg/dl' | 'mmol/L'
+export type GlucoseUnit = 'mg/dl' | 'mmol/L';
 
 export interface GlucoseRange {
-  name: string
-  lowerLimit: number
-  upperLimit: number
+  name: string;
+  lowerLimit: number;
+  upperLimit: number;
 }
 
 export interface GlucoseLimits {
-  unit: GlucoseUnit
-  ranges: GlucoseRange[]
+  unit: GlucoseUnit;
+  ranges: GlucoseRange[];
 }
 
-export type ServiceKey = 'nightscout' | 'pushover' | 'telegram'
+export type ServiceKey = 'nightscout' | 'pushover' | 'telegram';
 
 export interface NightscoutInfo {
-  version: string | null
-  latestGlucose: { sgv: number; direction: string | null; date: number | null } | null
-  battery: { level: number; isCharging: boolean | null } | null
-  sensor: { elapsedDays: number; changedAt: string | null } | null
-  pump: { elapsedDays: number; changedAt: string | null } | null
-  reservoirLevel: number | null
+  version: string | null;
+  latestGlucose: {
+    sgv: number;
+    direction: string | null;
+    date: number | null;
+  } | null;
+  battery: { level: number; isCharging: boolean | null } | null;
+  sensor: { elapsedDays: number; changedAt: string | null } | null;
+  pump: { elapsedDays: number; changedAt: string | null } | null;
+  reservoirLevel: number | null;
 }
 
 export const adminApi = createApi({
@@ -53,26 +57,54 @@ export const adminApi = createApi({
       providesTags: ['AdminConfig'],
     }),
     updateNightscout: builder.mutation<void, { url: string; apiKey: string }>({
-      query: (body) => ({ url: '/admin/config/nightscout', method: 'PATCH', body }),
+      query: (body) => ({
+        url: '/admin/config/nightscout',
+        method: 'PATCH',
+        body,
+      }),
       invalidatesTags: ['AdminConfig'],
     }),
-    updatePushover: builder.mutation<void, { appToken: string; userKey: string }>({
-      query: (body) => ({ url: '/admin/config/pushover', method: 'PATCH', body }),
+    updatePushover: builder.mutation<
+      void,
+      { appToken: string; userKey: string }
+    >({
+      query: (body) => ({
+        url: '/admin/config/pushover',
+        method: 'PATCH',
+        body,
+      }),
       invalidatesTags: ['AdminConfig'],
     }),
-    updateTelegram: builder.mutation<void, { botToken: string; chatId: string }>({
-      query: (body) => ({ url: '/admin/config/telegram', method: 'PATCH', body }),
+    updateTelegram: builder.mutation<
+      void,
+      { botToken: string; chatId: string }
+    >({
+      query: (body) => ({
+        url: '/admin/config/telegram',
+        method: 'PATCH',
+        body,
+      }),
       invalidatesTags: ['AdminConfig'],
     }),
-    testConnection: builder.mutation<{ ok: boolean }, { service: ServiceKey; config: Record<string, string> }>({
-      query: ({ service, config }) => ({ url: `/admin/config/test/${service}`, method: 'POST', body: config }),
+    testConnection: builder.mutation<
+      { ok: boolean },
+      { service: ServiceKey; config: Record<string, string> }
+    >({
+      query: ({ service, config }) => ({
+        url: `/admin/config/test/${service}`,
+        method: 'POST',
+        body: config,
+      }),
     }),
     getDatabaseStats: builder.query<DatabaseStats, void>({
       query: () => '/admin/database',
       providesTags: ['DatabaseStats'],
     }),
     deleteJobExecutions: builder.mutation<{ deletedCount: number }, string>({
-      query: (before) => ({ url: `/admin/database/job-executions?before=${encodeURIComponent(before)}`, method: 'DELETE' }),
+      query: (before) => ({
+        url: `/admin/database/job-executions?before=${encodeURIComponent(before)}`,
+        method: 'DELETE',
+      }),
       invalidatesTags: ['DatabaseStats'],
     }),
     getSchedulerConfig: builder.query<SchedulerConfig, void>({
@@ -80,7 +112,11 @@ export const adminApi = createApi({
       providesTags: ['Scheduler'],
     }),
     updateScheduler: builder.mutation<SchedulerConfig, string>({
-      query: (expression) => ({ url: '/admin/scheduler', method: 'PATCH', body: { expression } }),
+      query: (expression) => ({
+        url: '/admin/scheduler',
+        method: 'PATCH',
+        body: { expression },
+      }),
       invalidatesTags: ['Scheduler'],
     }),
     getNightscoutInfo: builder.query<NightscoutInfo, void>({
@@ -91,11 +127,15 @@ export const adminApi = createApi({
       providesTags: ['GlucoseLimits'],
     }),
     updateGlucoseLimits: builder.mutation<void, GlucoseLimits>({
-      query: (body) => ({ url: '/admin/glucose-limits', method: 'PATCH', body }),
+      query: (body) => ({
+        url: '/admin/glucose-limits',
+        method: 'PATCH',
+        body,
+      }),
       invalidatesTags: ['GlucoseLimits'],
     }),
   }),
-})
+});
 
 export const {
   useGetNightscoutInfoQuery,
@@ -110,4 +150,4 @@ export const {
   useUpdateSchedulerMutation,
   useGetGlucoseLimitsQuery,
   useUpdateGlucoseLimitsMutation,
-} = adminApi
+} = adminApi;

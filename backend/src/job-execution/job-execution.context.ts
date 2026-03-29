@@ -4,7 +4,7 @@ import { LogLevel } from '../log/log.schema';
 import * as jobExecutionSchema from './job-execution.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { NotificatorPayload } from '../notificator/notificator-provider-base';
-import { JobExecution, JobExecutionDocument } from './job-execution.schema';
+import { JobExecutionDocument } from './job-execution.schema';
 
 export class JobExecutionContext {
   constructor(

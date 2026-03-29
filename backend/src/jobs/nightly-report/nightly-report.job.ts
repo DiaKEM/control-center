@@ -45,7 +45,6 @@ export class NightlyReportJob extends ReportJobBase {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _stats: GlucoseReportStats,
   ): Promise<Array<{ buffer: Buffer; caption: string }>> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const dailyTir: DailyTir[] =
       await this.glucoseReport.computeNightlyTirHistory(14);
     if (!dailyTir.length) return [];

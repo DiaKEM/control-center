@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createHash } from 'crypto';
 
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
@@ -806,16 +807,12 @@ export class NightscoutService implements OnModuleInit {
     const isCharging: boolean | null =
       uploader?.isCharging ??
       uploader?.charging ??
-      (typeof latest['isCharging'] === 'boolean'
-        ? (latest['isCharging'] as boolean)
-        : null);
+      (typeof latest['isCharging'] === 'boolean' ? latest['isCharging'] : null);
 
     const history = statuses
       .map((s) => {
         const l = extractLevel(s);
-        const createdAt = s['created_at']
-          ? new Date(s['created_at'] as string)
-          : null;
+        const createdAt = s['created_at'] ? new Date(s['created_at']) : null;
         return l !== null && createdAt ? { createdAt, level: l } : null;
       })
       .filter((x): x is { createdAt: Date; level: number } => x !== null);

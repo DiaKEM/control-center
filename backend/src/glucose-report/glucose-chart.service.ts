@@ -133,7 +133,7 @@ export class GlucoseChartService {
     });
     await view.runAsync();
     const svgString = await view.toSVG();
-    await view.finalize();
+    view.finalize();
 
     return sharp(Buffer.from(svgString)).png().toBuffer();
   }
@@ -287,7 +287,7 @@ export class GlucoseChartService {
     });
     await view.runAsync();
     const svgString = await view.toSVG();
-    await view.finalize();
+    view.finalize();
 
     return sharp(Buffer.from(svgString)).png().toBuffer();
   }
@@ -449,7 +449,7 @@ export class GlucoseChartService {
     });
     await view.runAsync();
     const svgString = await view.toSVG();
-    await view.finalize();
+    view.finalize();
 
     return sharp(Buffer.from(svgString)).png().toBuffer();
   }
@@ -600,7 +600,7 @@ export class GlucoseChartService {
     });
     await view.runAsync();
     const svgString = await view.toSVG();
-    await view.finalize();
+    view.finalize();
 
     return sharp(Buffer.from(svgString)).png().toBuffer();
   }
@@ -799,7 +799,7 @@ export class GlucoseChartService {
     });
     await view.runAsync();
     const svgString = await view.toSVG();
-    await view.finalize();
+    view.finalize();
 
     return sharp(Buffer.from(svgString)).png().toBuffer();
   }
@@ -956,7 +956,7 @@ export class GlucoseChartService {
     });
     await view.runAsync();
     const svgString = await view.toSVG();
-    await view.finalize();
+    view.finalize();
 
     return sharp(Buffer.from(svgString)).png().toBuffer();
   }

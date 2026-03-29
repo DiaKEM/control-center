@@ -24,19 +24,19 @@ export abstract class ReportJobBase extends JobTypeBase {
     | { error: string };
 
   // Override in subclasses to attach an image to the notification.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected async getImageBuffer(
+
+  protected getImageBuffer(
     _stats: GlucoseReportStats,
   ): Promise<Buffer | undefined> {
-    return undefined;
+    return Promise.resolve(undefined);
   }
 
   // Override in subclasses to send additional image-only messages after the main report.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected async getAdditionalImages(
+
+  protected getAdditionalImages(
     _stats: GlucoseReportStats,
   ): Promise<Array<{ buffer: Buffer; caption: string }>> {
-    return [];
+    return Promise.resolve([]);
   }
 
   async execute(): Promise<JobExecutionContext> {

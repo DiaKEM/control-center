@@ -12,12 +12,6 @@ const mockUser = {
   save: jest.fn(),
 };
 
-const mockModel = {
-  findOne: jest.fn(),
-  // constructor mock
-  new: jest.fn(),
-};
-
 // Mock bcrypt at module level
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(() => Promise.resolve('hashed')),

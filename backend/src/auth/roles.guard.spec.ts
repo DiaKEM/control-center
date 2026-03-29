@@ -3,7 +3,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RolesGuard } from './roles.guard';
 
-function makeContext(user: unknown, roles: string[] | undefined) {
+function makeContext(user: unknown, _roles: string[] | undefined) {
   return {
     getHandler: () => ({}),
     getClass: () => ({}),
