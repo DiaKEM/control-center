@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.0](https://github.com/DiaKEM/control-center/compare/v0.5.3...v0.6.0) (2026-03-29)
+
+### Features
+
+* **no-ref:** add charging of battery into notification message ([e16b952](https://github.com/DiaKEM/control-center/commit/e16b95240a40566988dcd4174d6d4debbbbaffa4))
+* **no-ref:** add line chart to visualize battery drain ([b9bf4f3](https://github.com/DiaKEM/control-center/commit/b9bf4f33087ea5f5d39742fe4c8b39b6ac982993))
+* **no-ref:** deselect all job types for manual trigger section ([78e3145](https://github.com/DiaKEM/control-center/commit/78e314561306779f276781de1c8c4feb724803d1))
+* **no-ref:** extend 6-month report ([3ae0855](https://github.com/DiaKEM/control-center/commit/3ae0855ad9abb52467dc37a920039b944780ff57))
+* **no-ref:** extend battery level notification ([7d8a4fe](https://github.com/DiaKEM/control-center/commit/7d8a4fe8531a6880f27fac712929e6135629b9a8))
+* **no-ref:** extend report jobs with better markup ([28e45d5](https://github.com/DiaKEM/control-center/commit/28e45d52fc5ef28468f84c37807d80bdb3a2fbce))
+* **no-ref:** extend weekly report with avg blood sugar and tir ([13cdaf5](https://github.com/DiaKEM/control-center/commit/13cdaf5921e1d9a5a952f0f4a5f89779255682c9))
+* **no-ref:** merge multiple images into one single message in telegram ([74d5342](https://github.com/DiaKEM/control-center/commit/74d5342cfb6fce2ab25e755b0f7d44ec353acdfa))
+
 ## [0.5.3](https://github.com/DiaKEM/control-center/compare/v0.5.2...v0.5.3) (2026-03-28)
 
 ### Bug Fixes
