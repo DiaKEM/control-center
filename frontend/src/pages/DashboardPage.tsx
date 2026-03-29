@@ -355,7 +355,7 @@ export default function DashboardPage() {
                 Database size
               </div>
               <span className="font-medium">
-                {dbStats ? `${dbStats.totalSizeMb.toFixed(1)} MB` : '—'}
+                {dbStats ? `${(dbStats.totalSizeMb ?? 0).toFixed(1)} MB` : '—'}
               </span>
             </div>
           </div>
@@ -466,7 +466,8 @@ function NightscoutInfoWidget({
     ? TREND_MAP[info.latestGlucose.direction]
     : null;
 
-  const formatAge = (days: number) => {
+  const formatAge = (days: number | null | undefined) => {
+    if (days == null) return '—';
     if (days < 1) return `${Math.round(days * 24)}h`;
     return `${days.toFixed(1)}d`;
   };
