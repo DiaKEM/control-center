@@ -47,14 +47,36 @@ $ npm run test:cov
 
 ## Docker
 
-The project ships with a multi-stage `Dockerfile` and two Compose files:
+The project ships with a multi-stage `Dockerfile` and three Compose files:
 
 | File | Purpose |
 |---|---|
-| `docker-compose.yml` | Production — single app container + MongoDB |
-| `docker-compose.dev.yml` | Development — MongoDB + backend hot-reload + Vite HMR |
+| `docker-compose.mongodb.yml` | Shared MongoDB instance (start this first when using the setup below) |
+| `docker-compose.yml` | Production — app container, connects to shared MongoDB |
+| `docker-compose.standalone.yml` | Production — self-contained, includes its own MongoDB |
+| `docker-compose.dev.yml` | Development — dedicated MongoDB + backend hot-reload + Vite HMR |
+
+Use `docker-compose.yml` + `docker-compose.mongodb.yml` when running multiple app instances that share one database. Use `docker-compose.standalone.yml` for a single self-contained deployment.
+
+### 1. Start MongoDB (once, shared)
+
+Create a `.env` file in the project root (never commit it) and add at minimum:
+
+```bash
+MONGO_PASSWORD=your-secure-password
+```
+
+Then start MongoDB:
+
+```bash
+docker compose -f docker-compose.mongodb.yml up -d
+```
+
+MongoDB is now reachable at `localhost:27017` and on the `diakem-network` Docker network under the hostname `mongodb`.
 
 ### Development
+
+No `.env` required — credentials are hardcoded for local use. Just run:
 
 ```bash
 docker compose -f docker-compose.dev.yml up --build
@@ -69,6 +91,8 @@ docker compose -f docker-compose.dev.yml up --build
 Editing files under `backend/src/` or `frontend/src/` triggers hot-reload automatically via bind mounts. `node_modules` stays inside the containers so native modules are compiled for the correct platform.
 
 ### Production
+
+#### Single instance
 
 Create a `.env` file in the project root (never commit it):
 
@@ -87,12 +111,59 @@ Then build and start:
 docker compose up -d --build
 ```
 
-The app is available at `http://localhost:3015`. The NestJS backend serves the built React frontend as static files, so there is only one container to expose.
-
-To create the first admin user after the containers are running:
+To create the first admin user:
 
 ```bash
 docker compose exec app node dist/cli/main.js create-user admin admin --roles admin,user
+```
+
+#### Multiple instances
+
+Each instance needs its own port, database name, and Compose project name (the `-p` flag namespaces container names so they don't collide). Create one `.env` file per instance:
+
+**.env.instance-a**
+```bash
+INSTANCE_NAME=instance-a
+MONGO_PASSWORD=your-secure-password
+API_KEY=key-a
+JWT_SECRET=secret-a
+APP_PORT=3015
+```
+
+**.env.instance-b**
+```bash
+INSTANCE_NAME=instance-b
+MONGO_PASSWORD=your-secure-password
+API_KEY=key-b
+JWT_SECRET=secret-b
+APP_PORT=3016
+```
+
+Start each instance:
+
+```bash
+docker compose --env-file .env.instance-a up -d --build
+docker compose --env-file .env.instance-b up -d --build
+```
+
+To create the first admin user for a specific instance:
+
+```bash
+docker compose --env-file .env.instance-a exec app node dist/cli/main.js create-user admin admin --roles admin,user
+```
+
+### Standalone (single self-contained instance)
+
+Same `.env` variables as production. No need to start MongoDB separately:
+
+```bash
+docker compose -f docker-compose.standalone.yml up -d --build
+```
+
+To create the first admin user:
+
+```bash
+docker compose -f docker-compose.standalone.yml exec app node dist/cli/main.js create-user admin admin --roles admin,user
 ```
 
 # Configuration Guide

@@ -1,0 +1,63 @@
+services:
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_dev_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3015
+      API_KEY: dev-api-key
+      JWT_SECRET: dev-jwt-secret
+      JWT_EXPIRATION_IN_DAYS: 2
+      MONGODB_URI: mongodb://admin:admin@mongodb:27017/diakem-control-center?authSource=admin
+      # Points to the empty placeholder dir created in the backend-dev stage.
+      # The frontend is served by the Vite container in dev mode.
+      STATIC_FRONTEND_PATH: /tmp/frontend-static
+    volumes:
+      # Bind-mount source for hot-reload; node_modules stays inside the container
+      - ./backend/src:/app/src
+      - ./backend/test:/app/test
+    ports:
+      - "3015:3015"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend-dev
+    restart: unless-stopped
+    environment:
+      # Used by vite.config.ts to proxy /api requests to the backend container
+      BACKEND_URL: http://backend:3015
+    volumes:
+      # Bind-mount source for hot-reload; node_modules stays inside the container
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  mongodb_dev_data:

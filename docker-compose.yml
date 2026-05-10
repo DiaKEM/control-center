@@ -1,0 +1,25 @@
+name: ${INSTANCE_NAME:?INSTANCE_NAME is required}
+
+services:
+  diakem:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3015
+      API_KEY: ${API_KEY:?API_KEY is required}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_EXPIRATION_IN_DAYS: ${JWT_EXPIRATION_IN_DAYS:-2}
+      MONGODB_URI: mongodb://admin:${MONGO_PASSWORD:?MONGO_PASSWORD is required}@diakem-db:27017/${INSTANCE_NAME}?authSource=admin
+      STATIC_FRONTEND_PATH: ../frontend/dist
+    ports:
+      - "${APP_PORT:-3015}:3015"
+    networks:
+      - diakem-network
+
+networks:
+  diakem-network:
+    external: true
