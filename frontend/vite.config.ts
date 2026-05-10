@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3015',
+        target: process.env.BACKEND_URL ?? 'http://localhost:3015',
         changeOrigin: true,
       },
     },

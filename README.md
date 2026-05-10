@@ -45,18 +45,55 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Deployment
+## Docker
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+The project ships with a multi-stage `Dockerfile` and two Compose files:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+| File | Purpose |
+|---|---|
+| `docker-compose.yml` | Production — single app container + MongoDB |
+| `docker-compose.dev.yml` | Development — MongoDB + backend hot-reload + Vite HMR |
+
+### Development
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker compose -f docker-compose.dev.yml up --build
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+| Service | URL |
+|---|---|
+| Frontend (Vite HMR) | http://localhost:5173 |
+| Backend (hot-reload) | http://localhost:3015 |
+| MongoDB | localhost:27017 |
+
+Editing files under `backend/src/` or `frontend/src/` triggers hot-reload automatically via bind mounts. `node_modules` stays inside the containers so native modules are compiled for the correct platform.
+
+### Production
+
+Create a `.env` file in the project root (never commit it):
+
+```bash
+MONGO_PASSWORD=your-secure-password
+API_KEY=your-api-key
+JWT_SECRET=your-jwt-secret
+# Optional — defaults shown
+JWT_EXPIRATION_IN_DAYS=2
+APP_PORT=3015
+```
+
+Then build and start:
+
+```bash
+docker compose up -d --build
+```
+
+The app is available at `http://localhost:3015`. The NestJS backend serves the built React frontend as static files, so there is only one container to expose.
+
+To create the first admin user after the containers are running:
+
+```bash
+docker compose exec app node dist/cli/main.js create-user admin admin --roles admin,user
+```
 
 # Configuration Guide
 
