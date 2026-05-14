@@ -2,6 +2,7 @@ services:
   mongodb:
     image: mongo:7
     restart: unless-stopped
+    command: ["--wiredTigerCacheSizeGB", "${MONGO_CACHE_SIZE_GB:-0.25}"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?MONGO_PASSWORD is required}
