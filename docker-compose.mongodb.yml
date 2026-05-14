@@ -1,5 +1,6 @@
 services:
   diakem-db:
+    container_name: diakem-db
     image: mongo:7
     restart: unless-stopped
     environment:

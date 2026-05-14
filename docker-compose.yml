@@ -1,7 +1,6 @@
-name: ${INSTANCE_NAME:?INSTANCE_NAME is required}
-
 services:
   diakem:
+    container_name: ${INSTANCE_NAME}-diakem-control-center
     build:
       context: .
       dockerfile: Dockerfile
