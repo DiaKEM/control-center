@@ -18,7 +18,10 @@ services:
       - "${APP_PORT:-3015}:3015"
     networks:
       - diakem-network
+      - nginx-proxy-network
 
 networks:
   diakem-network:
+    external: true
+  nginx-proxy-network:
     external: true
