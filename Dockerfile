@@ -2,7 +2,8 @@
 # Stage: base — Node + native build deps (sharp, vega-node/canvas)
 # ─────────────────────────────────────────────────────────────
 FROM node:22-alpine AS base
-RUN apk add --no-cache python3 make g++ cairo-dev pango-dev libjpeg-turbo-dev giflib-dev librsvg-dev
+RUN apk add --no-cache python3 make g++ cairo-dev pango-dev libjpeg-turbo-dev giflib-dev librsvg-dev \
+    fontconfig ttf-freefont && fc-cache -f
 
 # ─────────────────────────────────────────────────────────────
 # Stage: backend-dev — hot-reload dev server
@@ -60,8 +61,9 @@ RUN npm ci --omit=dev
 # Stage: production — lean runtime image
 # ─────────────────────────────────────────────────────────────
 FROM node:22-alpine AS production
-# Runtime libs required by native modules (cairo for vega-node, etc.)
-RUN apk add --no-cache cairo pango libjpeg-turbo giflib librsvg
+# Runtime libs for native modules + fonts for server-side chart text rendering
+RUN apk add --no-cache cairo pango libjpeg-turbo giflib librsvg \
+    fontconfig ttf-freefont && fc-cache -f
 WORKDIR /app/backend
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=backend-builder /app/dist ./dist
